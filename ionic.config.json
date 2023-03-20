@@ -1,0 +1,7 @@
+{
+  "name": "atkApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
