@@ -1,0 +1,57 @@
+
+ion-content {
+  --overflow: hidden;
+}
+
+ion-input {
+  --background: #555;
+  border-radius: 10px;
+  --border-color: #ccc;
+  color: #fff;
+  width: 125%;
+  margin-top: 5%;
+}
+
+ion-button {
+  margin-top: 20px;
+}
+
+.pw-font {
+  color: rgb(240,135,33);
+}
+
+.input {
+  padding-left: 3%;
+}
+
+.pw-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-logo {
+  padding-right: 15px;
+}
+
+.pw-logo {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.logo {
+  margin-bottom: 20px;
+}
+
+.input-container {
+  width: 80%;
+  margin-bottom: 20px;
+}
