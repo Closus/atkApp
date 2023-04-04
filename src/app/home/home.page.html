@@ -1,20 +1,21 @@
-<ion-header [translucent]="true">
+<ion-header class="ion-no-border">
   <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+    <ion-title>Accueil</ion-title>
+    <ion-buttons slot="start">
+      <ion-button>
+        <fa-icon icon="bars" class="bars"></fa-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<div class="menu-items">
+  <span class="select"><fa-icon icon="hand-pointer"></fa-icon></span>
+  <span class="center"><fa-icon icon="arrows-to-eye"></fa-icon></span>
+  <span class="history"><fa-icon icon="timeline"></fa-icon></span>
+  <span class="calendar"><fa-icon icon="calendar-alt"></fa-icon></span>
+  <span class="itinerary"><fa-icon icon="location-arrow"></fa-icon></span>
+</div>
+<ion-content>
+  <div class="map">
   </div>
 </ion-content>
