@@ -47,7 +47,7 @@ ion-item {
   justify-content: space-around;
   align-items: center;
   background-color: #EC851E;
-  height: 65px;
+  height: 50px;
 }
 
 span {
@@ -56,39 +56,10 @@ span {
 
 /* BODY */
 
-.map {
+map {
   --overflow: hidden;
 }
 #mapId {
   height: 100%;
   width: 100%;
-}
-
-/* BOTTOM-SHEET-FILTER */
-.bottom-sheet-modal {
-  --height: 50%;
-  --width: 100%;
-  --border-radius: 20px 20px 0 0;
-  --overflow-y: scroll;
-  --position: absolute;
-  --bottom: 0;
-  --left: 0;
-}
-
-/* MODAL */
-
-ion-modal {
-  --height: 50%;
-  --border-radius: 16px;
-  --box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-}
-
-ion-modal::part(backdrop) {
-  background: rgba(209, 213, 219);
-  opacity: 1;
-}
-
-ion-modal ion-toolbar {
-  --background: black;
-  --color: #EC851E;
 }
