@@ -36,7 +36,7 @@ export class HomePage {
   async openBottomSheetFilter() {
     const modal = await this.modalController.create({
       component: BottomSheetFilterPage,
-      breakpoints: [0, 0.3, 0.5, 0.8],
+      breakpoints: [0, 0.5, 0.8],
       initialBreakpoint: 0.5
     });
     return await modal.present();
