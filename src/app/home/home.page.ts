@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import * as L from 'leaflet';
 
 @Component({
   selector: 'app-home',
@@ -10,5 +11,14 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
   imports: [IonicModule, FontAwesomeModule],
 })
 export class HomePage {
+  map: L.Map | undefined;
+
   constructor() {}
+  ionViewDidEnter() {
+    this.map = L.map('mapId').setView([50.4046, 4.3588], 9), {attributionControl: false};
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+    const markPoint = L.marker([50.44640, 4.53769]);
+    markPoint.bindPopup('<p>DSC Security</p>');
+    this.map.addLayer(markPoint);
+  }
 }
