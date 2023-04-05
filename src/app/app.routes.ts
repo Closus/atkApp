@@ -10,4 +10,8 @@ export const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full',
   },
+  {
+    path: 'bottom-sheet-filter',
+    loadComponent: () => import('./pages/bottom-sheet-filter/bottom-sheet-filter.page').then( m => m.BottomSheetFilterPage)
+  }
 ];

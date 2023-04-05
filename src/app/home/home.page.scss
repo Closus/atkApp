@@ -47,7 +47,11 @@ ion-item {
   justify-content: space-around;
   align-items: center;
   background-color: #EC851E;
-  height: 50px;
+  height: 65px;
+}
+
+span {
+  font-size: x-large;
 }
 
 /* BODY */
@@ -58,4 +62,15 @@ ion-content {
 #mapId {
   height: 100%;
   width: 100%;
+}
+
+/* BOTTOM-SHEET-FILTER */
+.bottom-sheet-modal {
+  --height: 50%;
+  --width: 100%;
+  --border-radius: 20px 20px 0 0;
+  --overflow-y: scroll;
+  --position: absolute;
+  --bottom: 0;
+  --left: 0;
 }
