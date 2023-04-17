@@ -1,0 +1,70 @@
+ion-toolbar {
+  --background: black;
+}
+
+ion-title {
+  color: white;
+}
+.pw-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pw-logo {
+  padding-right: 15px;
+}
+
+.pw-logo {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.input-container {
+  width: 80%;
+  margin-bottom: 20px;
+}
+
+ion-content {
+  --overflow: hidden;
+  --background: #222;
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+}
+
+.logo {
+  margin-bottom: 20px;
+}
+
+.input-container {
+  width: 80%;
+  margin-bottom: 20px;
+}
+
+ion-input {
+  --background: #555;
+  border-radius: 10px;
+  --border-color: #ccc;
+  color: #fff;
+  width: 120%;
+  margin-bottom: 20px;
+  margin-left: 2vw;
+}
+
+
+ion-button {
+  margin-top: 20px;
+}
+
+.container-form {
+  display: flex;
+}
+
+.test {
+  padding-left: 5px;
+}

@@ -9,6 +9,10 @@ ion-toolbar {
   height: 50px !important;
 }
 
+ion-content {
+  --overflow: hidden;
+}
+
 .md ion-toolbar {
   --padding-top: var(--status-bar-height);
 }
@@ -17,7 +21,7 @@ ion-title {
   font-size: 22px;
   font-family: WorkSans-Bold;
   font-weight: 900;
-  color: #EC851E;
+  color: white;
 }
 
 ion-title.md {
@@ -35,10 +39,6 @@ ion-item {
   }
 }
 
-.bars {
-  color: #ec851e;
-  font-size: x-large;
-}
 
 /* ITEMS MENU */
 
@@ -56,9 +56,6 @@ span {
 
 /* BODY */
 
-map {
-  --overflow: hidden;
-}
 #mapId {
   height: 100%;
   width: 100%;

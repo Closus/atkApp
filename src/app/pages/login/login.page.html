@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <div class="pw-title">
+        <div class="pw-logo">
+          <ion-icon name="key-outline"></ion-icon>
+        </div>      
+        <div class="pw-font">Password</div>
+      </div>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="container">
+    <div class="logo">
+      <img src="../../../assets/images/logo atk new.png" alt="Logo">
+    </div>
+    <form action="">
+      <div class="input-container">
+        <ion-input type="text" expand="block" class="test">Email</ion-input>
+        <ion-input type="password" expand="block">Password</ion-input>
+      </div>     
+    </form>
+    <div class="buttons-container">
+      <ion-button color="success" expand="block" shape="round" (click)="goToHomePage()">Confirm</ion-button>
+      <ion-button color="danger" expand="block" shape="round">Cancel</ion-button>
+    </div>
+  </div>
+</ion-content>

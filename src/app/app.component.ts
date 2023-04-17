@@ -4,7 +4,6 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
-import { BottomSheetFilterPage } from '../app/pages/bottom-sheet-filter/bottom-sheet-filter.page';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +11,7 @@ import { BottomSheetFilterPage } from '../app/pages/bottom-sheet-filter/bottom-s
   styleUrls: ['app.component.scss'],
   standalone: true,
   imports: [IonicModule, FontAwesomeModule],
-  entryComponents: [BottomSheetFilterPage]
+  entryComponents: []
 })
 export class AppComponent {
   constructor(library: FaIconLibrary) {

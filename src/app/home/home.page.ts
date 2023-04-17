@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { IonicModule, MenuController, ModalController } from '@ionic/angular';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import * as L from 'leaflet';
-import { BottomSheetFilterPage } from '../pages/bottom-sheet-filter/bottom-sheet-filter.page';
 
 @Component({
   selector: 'app-home',
@@ -31,15 +30,6 @@ export class HomePage {
 
   closeSideMenu() {
     this.menu.close('myMenu');
-  }
-
-  async openBottomSheetFilter() {
-    const modal = await this.modalController.create({
-      component: BottomSheetFilterPage,
-      breakpoints: [0, 0.5, 0.8],
-      initialBreakpoint: 0.5
-    });
-    return await modal.present();
   }
 }
 
