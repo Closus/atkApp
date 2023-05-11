@@ -48,7 +48,7 @@ ion-content {
 
 ion-input {
   --background: #555;
-  border-radius: 10px;
+  --border-radius: 10px !important;
   --border-color: #ccc;
   color: #fff;
   width: 120%;
@@ -63,8 +63,4 @@ ion-button {
 
 .container-form {
   display: flex;
-}
-
-.test {
-  padding-left: 5px;
 }

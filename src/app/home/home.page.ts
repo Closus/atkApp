@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { IonicModule, MenuController, ModalController } from '@ionic/angular';
+import { IonicModule, MenuController, ModalController, NavController } from '@ionic/angular';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
+import { UserService } from '../api/user.service';
 import * as L from 'leaflet';
 
 @Component({
@@ -12,8 +13,21 @@ import * as L from 'leaflet';
 })
 export class HomePage {
   map: L.Map | undefined;
+  email: string | undefined;
+  name: string | undefined;
+  mobile: string | undefined;
 
-  constructor(private menu: MenuController, public modalController: ModalController) {}
+  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController) {}
+
+  ngOnInit() {
+    if (this.userService.userDetails) {
+      this.email = this.userService.userDetails.email;
+      this.name = this.userService.userDetails.name;
+      this.mobile = this.userService.userDetails.mobile;
+    } else {
+      this.navController.navigateRoot('login');
+    }
+  }
 
   ionViewDidEnter() {
     this.map = L.map('mapId').setView([50.4046, 4.3588], 9), {attributionControl: false};
@@ -30,6 +44,10 @@ export class HomePage {
 
   closeSideMenu() {
     this.menu.close('myMenu');
+  }
+
+  disconnect() {
+    this.navController.navigateRoot('login');
   }
 }
 

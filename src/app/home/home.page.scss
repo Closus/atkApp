@@ -54,6 +54,36 @@ span {
   color: white;
 }
 
+.user {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.disconnect {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column-reverse;
+  margin-top: 50%;
+}
+
+.infos {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin-top: 10%;
+}
+
 /* BODY */
 
 #mapId {
