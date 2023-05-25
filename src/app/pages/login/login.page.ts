@@ -23,11 +23,11 @@ export class LoginPage implements OnInit {
 
   login() {
     this.userService.login('atk@autotracking.eu', 'atk25800').pipe(first()).subscribe((response: any) => {
-      const uuid = response.user.uuid;
-        console.log(response);
-        console.log("----------");
-        console.log(uuid);
-        this.userService.userDetails = response.user;
+      // const uuid = response.user.uuid;
+      //   console.log(response);
+      //   console.log("----------");
+      //   console.log(uuid);
+      //   this.userService.userDetails = response.user;
         this.navController.navigateRoot('home');
       }),
       catchError((error) => {
