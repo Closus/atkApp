@@ -41,7 +41,7 @@ export class LoginPage implements OnInit {
 
   goToHomePage() {
     this.navController.navigateRoot('home');
-    this.login();
+    //this.login();
   }
 
 }
