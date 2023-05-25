@@ -23,12 +23,12 @@ export class LoginPage implements OnInit {
 
   login() {
     this.userService.login('atk@autotracking.eu', 'atk25800').pipe(first()).subscribe((response: any) => {
-      // const uuid = response.user.uuid;
-      //   console.log(response);
-      //   console.log("----------");
-      //   console.log(uuid);
-      //   this.userService.userDetails = response.user;
-        this.navController.navigateRoot('home');
+      const uuid = response.user.uuid;
+      console.log(response);
+      console.log("----------");
+      console.log(uuid);
+      this.userService.userDetails = response.user;
+      this.navController.navigateRoot('home');
       }),
       catchError((error) => {
         console.log(error);
@@ -40,6 +40,7 @@ export class LoginPage implements OnInit {
   }
 
   goToHomePage() {
+    this.navController.navigateRoot('home');
     this.login();
   }
 
