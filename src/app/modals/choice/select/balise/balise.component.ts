@@ -2,8 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular';
 
-
-
 @Component({
   selector: 'app-balise',
   templateUrl: './balise.component.html',

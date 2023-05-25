@@ -22,7 +22,6 @@ export class LoginPage implements OnInit {
   password!: string;
 
   login() {
-    this.navController.navigateRoot('home');
     this.userService.login('atk@autotracking.eu', 'atk25800').pipe(first()).subscribe((response: any) => {
       const uuid = response.user.uuid;
       console.log(response);
