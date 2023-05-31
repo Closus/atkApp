@@ -9,7 +9,7 @@
 <ion-content>
   <ion-list>
     <ng-container *ngFor="let data of userService.combinedData">
-      <ion-item *ngIf="data.positionData.position" (click)="selectItem(data)">
+      <ion-item *ngIf="data.positionData.position"  (click)="selectItem(data)">
         <ion-avatar slot="start">
           <ion-img [src]="data.trackerData.pictureUrl"></ion-img>
         </ion-avatar>

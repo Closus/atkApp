@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { UserService } from 'src/app/api/user.service';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 
+
 @Component({
   selector: 'app-balise',
   templateUrl: './balise.component.html',
@@ -14,7 +15,7 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 })
 export class BaliseComponent  implements OnInit {
   reverseGeocodedAddresses: { [key: string]: string } = {};
-  public selectedItem: any = null;
+  
 
   constructor(private modalController: ModalController, public userService: UserService, private httpClient: HttpClient) { }
 
@@ -33,7 +34,7 @@ export class BaliseComponent  implements OnInit {
     }
   }
   closeModal() {
-    this.modalController.dismiss();
+    
   }
 
   async reverseGeocode(latitude: number, longitude: number): Promise<string> {
@@ -41,10 +42,8 @@ export class BaliseComponent  implements OnInit {
   }
 
   selectItem(item: any) {
-    this.selectedItem = item;
-    console.log('cliqué', this.selectedItem);
-    this.closeModal(); // Appel de la fonction closeModal() avant d'afficher la carte
-    //this.updateMapMarkers();
+    console.log('item', item);
+    this.modalController.dismiss(item);
   }
   
 }

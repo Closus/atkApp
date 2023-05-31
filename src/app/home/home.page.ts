@@ -7,8 +7,7 @@ import { first, interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
 import { forkJoin } from 'rxjs';
-import { Injectable } from '@angular/core';
-
+import { BehaviorSubject } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -17,13 +16,13 @@ import { Injectable } from '@angular/core';
   standalone: true,
   imports: [IonicModule, FontAwesomeModule]
 })
-@Injectable()
+
 export class HomePage implements AfterViewInit {
   map: L.Map | undefined;
   email: string | undefined;
   name: string | undefined;
   mobile: string | undefined;
-
+  selectedItem = new BehaviorSubject<any>(null);
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -33,7 +32,27 @@ export class HomePage implements AfterViewInit {
               ) {}
 
   ngOnInit() {
-
+    // Vérifier si un élément est sélectionné
+    this.selectedItem.subscribe((selected: any) => {
+      console.log('SELECTED',selected);
+      if (selected) {
+        const selectedMarker = L.marker([selected.positionData.position.latitude, selected.positionData.position.longitude]);
+        selectedMarker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+        this.map?.addLayer(selectedMarker);
+        this.map?.setView([selected.positionData.position.latitude, selected.positionData.position.longitude], 17);
+      }
+      else {
+        if (this.userService.positions && this.userService.positions.length > 0) {
+          this.userService.positions.forEach((data: any) => {
+            if (data.position) {
+              const markPoint = L.marker([data.position.latitude, data.position.longitude]);
+              markPoint.bindPopup(`<p>ok</p>`);
+              this.map?.addLayer(markPoint);
+            }
+          });
+        }
+      }
+    })
   }
   
   ngAfterViewInit(): void {
@@ -124,51 +143,23 @@ export class HomePage implements AfterViewInit {
       }
     });
   
-    // Ajouter les nouveaux marqueurs à la carte
-    if (this.userService.positions && this.userService.positions.length > 0) {
-      this.userService.positions.forEach((data: any) => {
-        if (data.position) {
-          const markPoint = L.marker([data.position.latitude, data.position.longitude]);
-          markPoint.bindPopup(`<p>${data.imei}</p>`);
-          this.map?.addLayer(markPoint);
-        }
-      });
-    }
+    // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
+    this.userService.combinedData.forEach((data: any) => {
+      if (data.positionData.position) {
+        const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude]);
+        markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
+        this.map?.addLayer(markPoint);
+      }
+    });
   }
-  // updateMapMarkers(): void {
-  //   // Effacer tous les marqueurs existants sur la carte
-  //   this.map?.eachLayer((layer) => {
-  //     if (layer instanceof L.Marker) {
-  //       this.map?.removeLayer(layer);
-  //     }
-  //   });
   
-  //   // Vérifier si un élément est sélectionné
-  //   if (this.selectedItem && this.selectedItem.positionData.position) {
-  //     // Ajouter le marqueur de l'élément sélectionné à la carte
-  //     const selectedMarker = L.marker([this.selectedItem.positionData.position.latitude, this.selectedItem.positionData.position.longitude]);
-  //     selectedMarker.bindPopup(`<p>${this.selectedItem.trackerData.name}</p>`);
-  //     this.map?.addLayer(selectedMarker);
-  //     this.map?.setView([this.selectedItem.positionData.position.latitude, this.selectedItem.positionData.position.longitude], 12);
-  //   } else {
-  //     // Ajouter tous les marqueurs des positions à la carte
-  //     if (this.userService.positions && this.userService.positions.length > 0) {
-  //       this.userService.positions.forEach((data: any) => {
-  //         if (data.position) {
-  //           const markPoint = L.marker([data.position.latitude, data.position.longitude]);
-  //           markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
-  //           this.map?.addLayer(markPoint);
-  //         }
-  //       });
-  //     }
-  //   }
-  // }
-  
-
   async presentModal() {
     const modal = await this.modalController.create({
       component: BaliseComponent
     });
+    modal.onDidDismiss().then((data) => {
+      this.selectedItem.next(data.data);
+    })
     return await modal.present();
   }
 }
