@@ -34,7 +34,7 @@ export class BaliseComponent  implements OnInit {
     }
   }
   closeModal() {
-    
+    this.modalController.dismiss(null);
   }
 
   async reverseGeocode(latitude: number, longitude: number): Promise<string> {
