@@ -6,6 +6,7 @@ import * as L from 'leaflet';
 import { first, interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
+import { forkJoin } from 'rxjs';
 
 
 @Component({
@@ -20,6 +21,7 @@ export class HomePage implements AfterViewInit {
   email: string | undefined;
   name: string | undefined;
   mobile: string | undefined;
+  combinedData: any[] = [];
 
 
   constructor(private menu: MenuController, 
@@ -29,7 +31,6 @@ export class HomePage implements AfterViewInit {
               ) {}
 
   ngOnInit() {
-    
   }
   
   ngAfterViewInit(): void {
@@ -37,36 +38,66 @@ export class HomePage implements AfterViewInit {
       this.email = this.userService.userDetails.email;
       this.name = this.userService.userDetails.name;
       this.mobile = this.userService.userDetails.mobile;
-
+  
       // Appel API initial
-      this.userService.getPositions().pipe(first()).subscribe((response: any) => {
-        this.userService.positions = response.trackinglist;
-        this.map = L.map('mapId').setView([50.4046, 4.3588], 9), {attributionControl: false};
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
-        console.log(this.userService.positions);
-
-        if (this.userService.positions && this.userService.positions.length > 0) {
-          console.log("fdp");
-          this.userService.positions.forEach((data: any) => {
-            console.log(data);
-            if (data.position) {
-                const markPoint = L.marker([data.position.latitude, data.position.longitude]);
-                markPoint.bindPopup(`<p>${data.imei}</p>`);
-                this.map?.addLayer(markPoint);
-          }
-        });
-        // Appel API toutes les 60 secondes
-        interval(60000).pipe(switchMap(() => this.userService.getPositions())).subscribe((response: any) => {
-          this.userService.positions = response.trackinglist;
-          this.updateMapMarkers();
-        });
-      }  
-        console.log(response.trackinglist);
-      })
-      } else {
-        this.navController.navigateRoot('login');
-      }
-    }
+      const listTrackers$ = this.userService.getAPI('listtrackers').pipe(first());
+      const positions$ = this.userService.getAPI('getpositions').pipe(first());
+  
+      forkJoin([listTrackers$, positions$]).subscribe(([listTrackersResponse, positionsResponse]: any[]) => {
+        const listTrackers = listTrackersResponse.trackers;
+        const positions = positionsResponse.trackinglist;
+        
+        console.log('listtrackers = ', listTrackers);
+        console.log('positions = ', positions);
+      
+        // Vérifiez si les données des appels API existent
+        if (listTrackers.length > 0 && positions.length > 0) {
+          // Réinitialisez la variable combinedData
+          this.combinedData = [];
+      
+          // Parcourez les listes de trackers et de positions
+          listTrackers.forEach((tracker: any) => {
+            const matchingPosition = positions.find((position: any) => position.imei === tracker.imei);
+            if (matchingPosition) {
+              // Combinez les données en ajoutant les propriétés nécessaires
+              const combinedItem = {
+                imei: tracker.imei,
+                trackerData: tracker,
+                positionData: matchingPosition
+              };
+      
+              // Ajoutez l'élément combiné à la variable combinedData
+              this.combinedData.push(combinedItem);
+            }
+          });
+      
+          console.log('combinedData = ', this.combinedData);
+      
+          this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
+          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+      
+          // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
+          this.combinedData.forEach((data: any) => {
+            if (data.positionData.position) {
+              const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude]);
+              markPoint.bindPopup(`<p>${data.imei}</p>`);
+              this.map?.addLayer(markPoint);
+            }
+          });
+      
+          // Appel API toutes les 60 secondes
+          interval(60000)
+            .pipe(switchMap(() => this.userService.getAPI('getpositions')))
+            .subscribe((response: any) => {
+              this.userService.positions = response.trackinglist;
+              this.updateMapMarkers();
+            });
+        } else {
+          this.navController.navigateRoot('login');
+        }
+      });
+    }      
+  }
 
   openSideMenu() {
     this.menu.enable(true, 'myMenu');

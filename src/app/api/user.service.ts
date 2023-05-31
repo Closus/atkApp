@@ -6,8 +6,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class UserService {
 
-  private apiUrl = 'http://geo.autotracking.eu/api.action?authuser';
-  private getPositionsUrl = 'http://geo.autotracking.eu/api.action?getpositions';
+  private apiUrl = 'http://geo.autotracking.eu/api.action';
+
   private getTripByIdUrl = 'http://geo.autotracking.eu/api.action?gettrip';
   private getTripByDateUrl = 'http://geo.autotracking.eu/api.action?gettrip';
 
@@ -19,6 +19,7 @@ export class UserService {
   public userDetails: any;
   public positions: any;
   public tracking: any;
+  public listtrackers: any[] = [];
   constructor(private http: HttpClient) { }
 
   login(email: string, password: string) {
@@ -26,11 +27,11 @@ export class UserService {
     body.set('token' , '7254941903');
     body.set('email', email);
     body.set('passwd', password);
-    return this.http.post(this.apiUrl, body.toString(), this.httpOptions);
+    return this.http.post(this.apiUrl + '?authuser', body.toString(), this.httpOptions);
   }
 
-  getPositions() {
-    return this.http.get(this.getPositionsUrl + '&token=7254941903' + '&uuid=' + this.userDetails.uuid);
+  getAPI(param : string) {
+    return this.http.get(this.apiUrl + '?' + param +'&token=7254941903' + '&uuid=' + this.userDetails.uuid);
   }
 
   getTripById() {
