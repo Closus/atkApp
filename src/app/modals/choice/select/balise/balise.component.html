@@ -8,16 +8,14 @@
 </ion-header>
 <ion-content>
   <ion-list>
-    <ng-container *ngFor="let data of userService.positions">
-      <ion-item *ngIf="data.position">
+    <ng-container *ngFor="let data of userService.combinedData">
+      <ion-item *ngIf="data.positionData.position">
         <ion-avatar slot="start">
-          <ion-img [src]="data.avatarUrl"></ion-img>
+          <ion-img [src]="data.trackerData.pictureUrl"></ion-img>
         </ion-avatar>
         <ion-label>
-          <h2>{{ data.imei }}</h2>
-          <p>{{ data.position.latitude }}</p>
-          <p>{{ data.position.longitude }}</p>
-          <p>{{ data.position.speed }} km/h</p>
+          <h2>{{ data.trackerData.name}}</h2>
+          <p>{{ data.positionData.position.speed }} km/h</p>
           <p>{{ reverseGeocodedAddresses[data.imei] || 'Loading...' }}</p>
         </ion-label>
       </ion-item>

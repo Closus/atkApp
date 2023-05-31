@@ -20,6 +20,7 @@ export class UserService {
   public positions: any;
   public tracking: any;
   public listtrackers: any[] = [];
+  combinedData: any[] = [];
   constructor(private http: HttpClient) { }
 
   login(email: string, password: string) {

@@ -21,7 +21,6 @@ export class HomePage implements AfterViewInit {
   email: string | undefined;
   name: string | undefined;
   mobile: string | undefined;
-  combinedData: any[] = [];
 
 
   constructor(private menu: MenuController, 
@@ -53,7 +52,7 @@ export class HomePage implements AfterViewInit {
         // Vérifiez si les données des appels API existent
         if (listTrackers.length > 0 && positions.length > 0) {
           // Réinitialisez la variable combinedData
-          this.combinedData = [];
+          this.userService.combinedData = [];
       
           // Parcourez les listes de trackers et de positions
           listTrackers.forEach((tracker: any) => {
@@ -67,17 +66,17 @@ export class HomePage implements AfterViewInit {
               };
       
               // Ajoutez l'élément combiné à la variable combinedData
-              this.combinedData.push(combinedItem);
+              this.userService.combinedData.push(combinedItem);
             }
           });
       
-          console.log('combinedData = ', this.combinedData);
+          console.log('combinedData = ', this.userService.combinedData);
       
           this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
           L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
       
           // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
-          this.combinedData.forEach((data: any) => {
+          this.userService.combinedData.forEach((data: any) => {
             if (data.positionData.position) {
               const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude]);
               markPoint.bindPopup(`<p>${data.imei}</p>`);

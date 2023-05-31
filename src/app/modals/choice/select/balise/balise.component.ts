@@ -24,7 +24,7 @@ export class BaliseComponent  implements OnInit {
   }
 
   async ngOnInit() {
-    for (const data of this.userService.positions) {
+    for (const data of this.userService.combinedData) {
       if (data.position) {
         const address = await this.reverseGeocode(data.position.latitude, data.position.longitude);
         this.reverseGeocodedAddresses[data.imei] = address;
