@@ -43,4 +43,8 @@ export class UserService {
   getTripByDate() {
     return this.http.get(this.getTripByDateUrl + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + this.tracking.tracker + "&date=" + this.tracking.date);
   }
+
+  reverseGeocode(latitude: any, longitude: any){
+    return this.http.get('http://94.23.210.102/nominatim/reverse?format=geojson&lat=' + latitude + '&lon=' + longitude );
+  }
 }

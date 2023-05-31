@@ -14,7 +14,7 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
   imports: [IonicModule, CommonModule]
 })
 export class BaliseComponent  implements OnInit {
-  reverseGeocodedAddresses: { [key: string]: string } = {};
+  reverseGeocodedAddresses: any;
   
 
   constructor(private modalController: ModalController, public userService: UserService, private httpClient: HttpClient) { }
@@ -25,11 +25,10 @@ export class BaliseComponent  implements OnInit {
     })
   }
 
-  async ngOnInit() {
+  ngOnInit() {
     for (const data of this.userService.combinedData) {
-      if (data.position) {
-        const address = await this.reverseGeocode(data.position.latitude, data.position.longitude);
-        this.reverseGeocodedAddresses[data.imei] = address;
+      if (data.positionData.position) {
+        
       }
     }
   }
@@ -37,9 +36,6 @@ export class BaliseComponent  implements OnInit {
     this.modalController.dismiss(null);
   }
 
-  async reverseGeocode(latitude: number, longitude: number): Promise<string> {
-    return "";
-  }
 
   selectItem(item: any) {
     console.log('item', item);

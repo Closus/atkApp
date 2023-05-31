@@ -81,12 +81,20 @@ export class HomePage implements AfterViewInit {
           listTrackers.forEach((tracker: any) => {
             const matchingPosition = positions.find((position: any) => position.imei === tracker.imei);
             if (matchingPosition) {
-              // Combinez les données en ajoutant les propriétés nécessaires
-              const combinedItem = {
+              let combinedItem = {
                 imei: tracker.imei,
                 trackerData: tracker,
-                positionData: matchingPosition
+                positionData: matchingPosition,
+                address: null
               };
+
+              if (matchingPosition.position) {
+                let geocode = this.userService.reverseGeocode(matchingPosition.position.latitude, matchingPosition.position.longitude).pipe(first()).subscribe((response: any) => {
+                  combinedItem['address'] = response.features[0].properties.address;
+                });
+              }
+              // Combinez les données en ajoutant les propriétés nécessaires
+              
       
               // Ajoutez l'élément combiné à la variable combinedData
               this.userService.combinedData.push(combinedItem);
