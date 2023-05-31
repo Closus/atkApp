@@ -14,6 +14,7 @@ import { HttpHeaders, HttpClient } from '@angular/common/http';
 })
 export class BaliseComponent  implements OnInit {
   reverseGeocodedAddresses: { [key: string]: string } = {};
+  public selectedItem: any = null;
 
   constructor(private modalController: ModalController, public userService: UserService, private httpClient: HttpClient) { }
 
@@ -39,6 +40,11 @@ export class BaliseComponent  implements OnInit {
     return "";
   }
 
-
+  selectItem(item: any) {
+    this.selectedItem = item;
+    console.log('cliqué', this.selectedItem);
+    this.closeModal(); // Appel de la fonction closeModal() avant d'afficher la carte
+    //this.updateMapMarkers();
+  }
   
 }

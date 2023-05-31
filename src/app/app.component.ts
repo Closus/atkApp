@@ -4,6 +4,7 @@ import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontaweso
 import { fas } from '@fortawesome/free-solid-svg-icons'
 import { far } from '@fortawesome/free-regular-svg-icons'
 import { fab } from '@fortawesome/free-brands-svg-icons'
+import { BaliseComponent } from './modals/choice/select/balise/balise.component';
 
 @Component({
   selector: 'app-root',
@@ -11,6 +12,7 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
   styleUrls: ['app.component.scss'],
   standalone: true,
   imports: [IonicModule, FontAwesomeModule],
+  providers: [BaliseComponent],
   entryComponents: []
 })
 export class AppComponent {

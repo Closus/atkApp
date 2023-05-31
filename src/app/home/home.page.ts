@@ -7,6 +7,7 @@ import { first, interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
 import { forkJoin } from 'rxjs';
+import { Injectable } from '@angular/core';
 
 
 @Component({
@@ -14,8 +15,9 @@ import { forkJoin } from 'rxjs';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonicModule, FontAwesomeModule],
+  imports: [IonicModule, FontAwesomeModule]
 })
+@Injectable()
 export class HomePage implements AfterViewInit {
   map: L.Map | undefined;
   email: string | undefined;
@@ -26,10 +28,12 @@ export class HomePage implements AfterViewInit {
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
               private userService: UserService, 
-              private navController: NavController
+              private navController: NavController,
+              private balise : BaliseComponent
               ) {}
 
   ngOnInit() {
+
   }
   
   ngAfterViewInit(): void {
@@ -79,7 +83,7 @@ export class HomePage implements AfterViewInit {
           this.userService.combinedData.forEach((data: any) => {
             if (data.positionData.position) {
               const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude]);
-              markPoint.bindPopup(`<p>${data.imei}</p>`);
+              markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
               this.map?.addLayer(markPoint);
             }
           });
@@ -89,6 +93,7 @@ export class HomePage implements AfterViewInit {
             .pipe(switchMap(() => this.userService.getAPI('getpositions')))
             .subscribe((response: any) => {
               this.userService.positions = response.trackinglist;
+              console.log('refresh 60 secondes');
               this.updateMapMarkers();
             });
         } else {
@@ -130,6 +135,35 @@ export class HomePage implements AfterViewInit {
       });
     }
   }
+  // updateMapMarkers(): void {
+  //   // Effacer tous les marqueurs existants sur la carte
+  //   this.map?.eachLayer((layer) => {
+  //     if (layer instanceof L.Marker) {
+  //       this.map?.removeLayer(layer);
+  //     }
+  //   });
+  
+  //   // Vérifier si un élément est sélectionné
+  //   if (this.selectedItem && this.selectedItem.positionData.position) {
+  //     // Ajouter le marqueur de l'élément sélectionné à la carte
+  //     const selectedMarker = L.marker([this.selectedItem.positionData.position.latitude, this.selectedItem.positionData.position.longitude]);
+  //     selectedMarker.bindPopup(`<p>${this.selectedItem.trackerData.name}</p>`);
+  //     this.map?.addLayer(selectedMarker);
+  //     this.map?.setView([this.selectedItem.positionData.position.latitude, this.selectedItem.positionData.position.longitude], 12);
+  //   } else {
+  //     // Ajouter tous les marqueurs des positions à la carte
+  //     if (this.userService.positions && this.userService.positions.length > 0) {
+  //       this.userService.positions.forEach((data: any) => {
+  //         if (data.position) {
+  //           const markPoint = L.marker([data.position.latitude, data.position.longitude]);
+  //           markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
+  //           this.map?.addLayer(markPoint);
+  //         }
+  //       });
+  //     }
+  //   }
+  // }
+  
 
   async presentModal() {
     const modal = await this.modalController.create({
