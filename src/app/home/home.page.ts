@@ -34,7 +34,7 @@ export class HomePage implements AfterViewInit {
 
   ngOnInit() {
     let customIcon = L.icon({
-      iconUrl: '../../assets/images/marker.png',
+      iconUrl: '../../assets/images/marker4.png',
     
       iconSize:     [45, 45], // size of the icon
     });
@@ -63,7 +63,7 @@ export class HomePage implements AfterViewInit {
   
   ngAfterViewInit(): void {
     let customIcon = L.icon({
-      iconUrl: '../../assets/images/marker.png',
+      iconUrl: '../../assets/images/marker4.png',
     
       iconSize:     [45, 45], // size of the icon
     });
@@ -156,7 +156,7 @@ export class HomePage implements AfterViewInit {
 
   updateMapMarkers(): void {
     let customIcon = L.icon({
-      iconUrl: '../../assets/images/marker.png',
+      iconUrl: '../../assets/images/marker4.png',
     
       iconSize:     [45, 45], // size of the icon
     });
