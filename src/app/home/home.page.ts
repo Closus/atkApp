@@ -8,13 +8,15 @@ import { switchMap } from 'rxjs/operators';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
 import { forkJoin } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
+import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } from 'ion2-calendar';
+
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonicModule, FontAwesomeModule]
+  imports: [IonicModule, FontAwesomeModule, CalendarModule]
 })
 
 export class HomePage implements AfterViewInit {
@@ -24,6 +26,7 @@ export class HomePage implements AfterViewInit {
   mobile: string | undefined;
   selectedItem = new BehaviorSubject<any>(null);
   pageTitle: string = 'Accueil';  
+  selectedDate: string | undefined;
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -33,6 +36,7 @@ export class HomePage implements AfterViewInit {
               ) {}
 
   ngOnInit() {
+    this.menu.swipeGesture(false);
     let customIcon = L.icon({
       iconUrl: '../../assets/images/test.png',
     
@@ -149,7 +153,7 @@ export class HomePage implements AfterViewInit {
   openSideMenu() {
     this.menu.enable(true, 'myMenu');
     this.menu.open('myMenu');
-  }
+  } 
 
   closeSideMenu() {
     this.menu.close('myMenu');
@@ -204,6 +208,31 @@ export class HomePage implements AfterViewInit {
     const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedPosition.latitude},${selectedPosition.longitude}`;
     window.open(url, '_blank');
   }  
+
+  async openCalendar() {
+    const options: CalendarModalOptions = {
+      color: 'dark', // Couleur du calendrier (noir)
+      title: 'Sélectionnez une date', // Titre du calendrier
+      canBackwardsSelected: true, // Autorise la sélection de dates antérieures
+      defaultDate: this.selectedDate ? new Date(this.selectedDate) : new Date() // Date par défaut (la date sélectionnée ou la date actuelle)
+    };
+    
+    const calendarModal = await this.modalController.create({
+      component: CalendarModal,
+      componentProps: {
+        options: options
+      }
+    });
+  
+    await calendarModal.present();
+  
+    const { data } = await calendarModal.onWillDismiss<CalendarResult>();
+    if (data && data.date) {
+      const selectedDate = data.date + '/' + data.months + '/' + data.years;
+      console.log(data, 'datatime');
+      this.pageTitle = this.pageTitle + ' - ' + selectedDate.toLocaleString() ;
+    }
+  }
 }
 
 
