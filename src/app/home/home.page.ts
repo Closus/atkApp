@@ -23,7 +23,7 @@ export class HomePage implements AfterViewInit {
   name: string | undefined;
   mobile: string | undefined;
   selectedItem = new BehaviorSubject<any>(null);
-  
+  pageTitle: string = 'Accueil';  
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -34,13 +34,18 @@ export class HomePage implements AfterViewInit {
 
   ngOnInit() {
     let customIcon = L.icon({
-      iconUrl: '../../assets/images/marker4.png',
+      iconUrl: '../../assets/images/test.png',
     
       iconSize:     [45, 45], // size of the icon
     });
     // Vérifier si un élément est sélectionné
     this.selectedItem.subscribe((selected: any) => {
       console.log('SELECTED',selected);
+      if (selected) {
+        this.pageTitle = selected.trackerData.name;
+      } else {
+        this.pageTitle = 'Accueil';
+      }
       if (selected) {
         const selectedMarker = L.marker([selected.positionData.position.latitude, selected.positionData.position.longitude], {icon: customIcon});
         selectedMarker.bindPopup(`<p>${selected.trackerData.name}</p>`);
@@ -52,7 +57,7 @@ export class HomePage implements AfterViewInit {
           this.userService.positions.forEach((data: any) => {
             if (data.position) {
               const markPoint = L.marker([data.position.latitude, data.position.longitude], {icon: customIcon});
-              markPoint.bindPopup(`<p>ok</p>`);
+              markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
               this.map?.addLayer(markPoint);
             }
           });
@@ -63,7 +68,7 @@ export class HomePage implements AfterViewInit {
   
   ngAfterViewInit(): void {
     let customIcon = L.icon({
-      iconUrl: '../../assets/images/marker4.png',
+      iconUrl: '../../assets/images/test.png',
     
       iconSize:     [45, 45], // size of the icon
     });
@@ -156,7 +161,7 @@ export class HomePage implements AfterViewInit {
 
   updateMapMarkers(): void {
     let customIcon = L.icon({
-      iconUrl: '../../assets/images/marker4.png',
+      iconUrl: '../../assets/images/test.png',
     
       iconSize:     [45, 45], // size of the icon
     });
@@ -186,6 +191,19 @@ export class HomePage implements AfterViewInit {
     })
     return await modal.present();
   }
+
+  centerMap(): void {
+    if (this.selectedItem.value && this.selectedItem.value.positionData.position) {
+      const selectedPosition = this.selectedItem.value.positionData.position;
+      this.map?.setView([selectedPosition.latitude, selectedPosition.longitude], 17, { animate: true });
+    }
+  }
+
+  launchNavigation(): void {
+    const selectedPosition = this.selectedItem.value.positionData.position;
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedPosition.latitude},${selectedPosition.longitude}`;
+    window.open(url, '_blank');
+  }  
 }
 
 
