@@ -23,6 +23,7 @@ export class HomePage implements AfterViewInit {
   name: string | undefined;
   mobile: string | undefined;
   selectedItem = new BehaviorSubject<any>(null);
+  
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -32,20 +33,25 @@ export class HomePage implements AfterViewInit {
               ) {}
 
   ngOnInit() {
+    let customIcon = L.icon({
+      iconUrl: '../../assets/images/marker.png',
+    
+      iconSize:     [45, 45], // size of the icon
+    });
     // Vérifier si un élément est sélectionné
     this.selectedItem.subscribe((selected: any) => {
       console.log('SELECTED',selected);
       if (selected) {
-        const selectedMarker = L.marker([selected.positionData.position.latitude, selected.positionData.position.longitude]);
+        const selectedMarker = L.marker([selected.positionData.position.latitude, selected.positionData.position.longitude], {icon: customIcon});
         selectedMarker.bindPopup(`<p>${selected.trackerData.name}</p>`);
         this.map?.addLayer(selectedMarker);
-        this.map?.setView([selected.positionData.position.latitude, selected.positionData.position.longitude], 17);
+        this.map?.setView([selected.positionData.position.latitude, selected.positionData.position.longitude], 17, {animate: true});
       }
       else {
         if (this.userService.positions && this.userService.positions.length > 0) {
           this.userService.positions.forEach((data: any) => {
             if (data.position) {
-              const markPoint = L.marker([data.position.latitude, data.position.longitude]);
+              const markPoint = L.marker([data.position.latitude, data.position.longitude], {icon: customIcon});
               markPoint.bindPopup(`<p>ok</p>`);
               this.map?.addLayer(markPoint);
             }
@@ -56,6 +62,11 @@ export class HomePage implements AfterViewInit {
   }
   
   ngAfterViewInit(): void {
+    let customIcon = L.icon({
+      iconUrl: '../../assets/images/marker.png',
+    
+      iconSize:     [45, 45], // size of the icon
+    });
     if (this.userService.userDetails) {
       this.email = this.userService.userDetails.email;
       this.name = this.userService.userDetails.name;
@@ -109,7 +120,7 @@ export class HomePage implements AfterViewInit {
           // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
           this.userService.combinedData.forEach((data: any) => {
             if (data.positionData.position) {
-              const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude]);
+              const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude], { icon: customIcon });
               markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
               this.map?.addLayer(markPoint);
             }
@@ -144,6 +155,11 @@ export class HomePage implements AfterViewInit {
   }
 
   updateMapMarkers(): void {
+    let customIcon = L.icon({
+      iconUrl: '../../assets/images/marker.png',
+    
+      iconSize:     [45, 45], // size of the icon
+    });
     // Effacer tous les marqueurs existants sur la carte
     this.map?.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
@@ -154,7 +170,7 @@ export class HomePage implements AfterViewInit {
     // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
     this.userService.combinedData.forEach((data: any) => {
       if (data.positionData.position) {
-        const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude]);
+        const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude], { icon: customIcon });
         markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
         this.map?.addLayer(markPoint);
       }

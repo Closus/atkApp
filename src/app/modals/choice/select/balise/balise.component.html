@@ -9,7 +9,7 @@
 <ion-content style="--background: black;">
   <ion-list style="background: black;">
     <ng-container *ngFor="let data of userService.combinedData">
-      <ion-item *ngIf="data.positionData.position"  (click)="selectItem(data)" style="--background: black;">
+      <ion-item *ngIf="data.positionData.position"  (click)="selectItem(data)" style="--background: black;border-bottom: solid 1px #EC851E;">
         <ion-avatar slot="start">
           <ion-img [src]="data.trackerData.pictureUrl"></ion-img>
         </ion-avatar>
