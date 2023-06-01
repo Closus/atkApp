@@ -1,19 +1,19 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Balises</ion-title>
+  <ion-toolbar style="--background: #EC851E;">
+    <ion-title style="color: white;">Balises</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="closeModal()">Close</ion-button>
+      <ion-button (click)="closeModal()" style="color: white;">Close</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-  <ion-list>
+<ion-content style="--background: black;">
+  <ion-list style="background: black;">
     <ng-container *ngFor="let data of userService.combinedData">
-      <ion-item *ngIf="data.positionData.position"  (click)="selectItem(data)">
+      <ion-item *ngIf="data.positionData.position"  (click)="selectItem(data)" style="--background: black;">
         <ion-avatar slot="start">
           <ion-img [src]="data.trackerData.pictureUrl"></ion-img>
         </ion-avatar>
-        <ion-label>
+        <ion-label style="color: white;">
           <h2>{{ data.trackerData.name}}</h2>
           <p>{{ data.positionData.position.speed }} km/h</p>
           <!-- <p>{{ reverseGeocodedAddresses[data.imei] || 'Loading...' }}</p> -->
