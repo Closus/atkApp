@@ -32,7 +32,13 @@
   <div class="menu-items">
     <span class="select" (click)="presentModal()"><fa-icon icon="hand-pointer"></fa-icon></span>
     <span class="center" (click)="centerMap()"><fa-icon icon="arrows-to-eye"></fa-icon></span>
-    <span class="history"><fa-icon icon="timeline"></fa-icon></span>
+    <ng-container *ngIf="numberDate">
+      <span class="history" (click)="selectedDateTrip()"><fa-icon icon="timeline"></fa-icon></span>
+    </ng-container>    
+    <!-- Condition sans date sélectionnée -->
+    <ng-container *ngIf="!numberDate">
+      <span class="history" (click)="selectedTrip()"><fa-icon icon="timeline"></fa-icon></span>
+    </ng-container>
     <span class="calendar" (click)="openCalendar()"><fa-icon icon="calendar-alt"></fa-icon></span>
     <span class="itinerary" (click)="launchNavigation()"><fa-icon icon="location-arrow"></fa-icon></span>
   </div>

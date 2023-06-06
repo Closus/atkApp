@@ -2,6 +2,7 @@ import { Component, AfterViewInit } from '@angular/core';
 import { IonicModule, MenuController, ModalController, NavController } from '@ionic/angular';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { UserService } from '../api/user.service';
+import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { first, interval } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
@@ -16,7 +17,7 @@ import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } f
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonicModule, FontAwesomeModule, CalendarModule]
+  imports: [IonicModule, FontAwesomeModule, CalendarModule, CommonModule]
 })
 
 export class HomePage implements AfterViewInit {
@@ -27,6 +28,7 @@ export class HomePage implements AfterViewInit {
   selectedItem = new BehaviorSubject<any>(null);
   pageTitle: string = 'Accueil';  
   selectedDate: string | undefined;
+  numberDate: string | undefined;
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -40,33 +42,39 @@ export class HomePage implements AfterViewInit {
     let customIcon = L.icon({
       iconUrl: '../../assets/images/test.png',
     
-      iconSize:     [45, 45], // size of the icon
+      iconSize:     [25, 25], // size of the icon
     });
     // Vérifier si un élément est sélectionné
     this.selectedItem.subscribe((selected: any) => {
       console.log('SELECTED',selected);
       if (selected) {
         this.pageTitle = selected.trackerData.name;
+
+        if (!selected.marker) {
+          const customIcon = L.icon({
+            iconUrl: '../../assets/images/test.png',
+            iconSize: [25, 25],
+          });
+    
+          selected.marker = L.marker(
+            [selected.positionData.position.latitude, selected.positionData.position.longitude],
+            { icon: customIcon }
+          );
+          selected.marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+        }
       } else {
         this.pageTitle = 'Accueil';
       }
-      if (selected) {
-        const selectedMarker = L.marker([selected.positionData.position.latitude, selected.positionData.position.longitude], {icon: customIcon});
-        selectedMarker.bindPopup(`<p>${selected.trackerData.name}</p>`);
-        this.map?.addLayer(selectedMarker);
-        this.map?.setView([selected.positionData.position.latitude, selected.positionData.position.longitude], 17, {animate: true});
-      }
-      else {
-        if (this.userService.positions && this.userService.positions.length > 0) {
-          this.userService.positions.forEach((data: any) => {
-            if (data.position) {
-              const markPoint = L.marker([data.position.latitude, data.position.longitude], {icon: customIcon});
-              markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
-              this.map?.addLayer(markPoint);
-            }
-          });
-        }
-      }
+      this.updateSelectedMarker();
+
+      // Appel API toutes les 60 secondes
+      interval(60000)
+      .pipe(switchMap(() => this.userService.getAPI('getpositions')))
+      .subscribe((response: any) => {
+        this.userService.positions = response.trackinglist;
+        console.log('refresh 60 secondes');
+        this.updateSelectedMarker();
+      });
     })
   }
   
@@ -74,7 +82,7 @@ export class HomePage implements AfterViewInit {
     let customIcon = L.icon({
       iconUrl: '../../assets/images/test.png',
     
-      iconSize:     [45, 45], // size of the icon
+      iconSize:     [25, 25], // size of the icon
     });
     if (this.userService.userDetails) {
       this.email = this.userService.userDetails.email;
@@ -112,9 +120,7 @@ export class HomePage implements AfterViewInit {
                 let geocode = this.userService.reverseGeocode(matchingPosition.position.latitude, matchingPosition.position.longitude).pipe(first()).subscribe((response: any) => {
                   combinedItem['address'] = response.features[0].properties.address;
                 });
-              }
-              // Combinez les données en ajoutant les propriétés nécessaires
-              
+              }              
       
               // Ajoutez l'élément combiné à la variable combinedData
               this.userService.combinedData.push(combinedItem);
@@ -124,25 +130,7 @@ export class HomePage implements AfterViewInit {
           console.log('combinedData = ', this.userService.combinedData);
       
           this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
-      
-          // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
-          this.userService.combinedData.forEach((data: any) => {
-            if (data.positionData.position) {
-              const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude], { icon: customIcon });
-              markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
-              this.map?.addLayer(markPoint);
-            }
-          });
-      
-          // Appel API toutes les 60 secondes
-          interval(60000)
-            .pipe(switchMap(() => this.userService.getAPI('getpositions')))
-            .subscribe((response: any) => {
-              this.userService.positions = response.trackinglist;
-              console.log('refresh 60 secondes');
-              this.updateMapMarkers();
-            });
+          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);          
         } else {
           this.navController.navigateRoot('login');
         }
@@ -163,28 +151,44 @@ export class HomePage implements AfterViewInit {
     this.navController.navigateRoot('login');
   }
 
-  updateMapMarkers(): void {
-    let customIcon = L.icon({
-      iconUrl: '../../assets/images/test.png',
+  // updateMapMarkers(): void {
+  //   let customIcon = L.icon({
+  //     iconUrl: '../../assets/images/test.png',
     
-      iconSize:     [45, 45], // size of the icon
-    });
-    // Effacer tous les marqueurs existants sur la carte
-    this.map?.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        this.map?.removeLayer(layer);
-      }
-    });
+  //     iconSize:     [25, 25], // size of the icon
+  //   });
+  //   // Effacer tous les marqueurs existants sur la carte
+  //   this.map?.eachLayer((layer) => {
+  //     if (layer instanceof L.Marker) {
+  //       this.map?.removeLayer(layer);
+  //     }
+  //   });
   
-    // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
-    this.userService.combinedData.forEach((data: any) => {
-      if (data.positionData.position) {
-        const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude], { icon: customIcon });
-        markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
-        this.map?.addLayer(markPoint);
+  //   // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
+  //   this.userService.combinedData.forEach((data: any) => {
+  //     if ( data.positionData.position) {
+  //       const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude], { icon: customIcon });
+  //       markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
+  //       this.map?.addLayer(markPoint);
+  //     }
+  //   });
+  // }
+
+  updateSelectedMarker(): void {
+    const selected = this.selectedItem.getValue();
+    if (selected && selected.positionData.position && selected.marker) {
+      selected.marker.setLatLng([
+        selected.positionData.position.latitude,
+        selected.positionData.position.longitude,
+      ]);
+  
+      selected.marker.setPopupContent(`<p>${selected.trackerData.name}</p>`);
+  
+      if (!this.map?.hasLayer(selected.marker)) {
+        this.map?.addLayer(selected.marker);
       }
-    });
-  }
+    }
+  }  
   
   async presentModal() {
     const modal = await this.modalController.create({
@@ -231,8 +235,32 @@ export class HomePage implements AfterViewInit {
       const selectedDate = data.date + '/' + data.months + '/' + data.years;
       console.log(data, 'datatime');
       this.pageTitle = this.pageTitle + ' - ' + selectedDate.toLocaleString() ;
+      if (data.date < 10 || data.months < 10) {
+        const day = data.date.toString().padStart(2, '0'); // Ajouter un zéro devant le jour si nécessaire
+        const month = data.months.toString().padStart(2, '0'); // Ajouter un zéro devant le mois si nécessaire
+        this.numberDate = `${data.years}${month}${day}`;
+      } else {
+        this.numberDate = selectedDate.split('/').join('');
+      }
+      console.log(this.numberDate);
     }
   }
+
+  selectedTrip() {
+    this.userService.getTripById('gettrip', this.selectedItem.value.trackerData.id).subscribe((data: any) => {
+      console.log('data du trip = ', data);
+    });
+  }
+
+  selectedDateTrip() {
+    if (this.numberDate) {
+      this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id,this.numberDate).subscribe((data: any) => {
+        console.log('data du trip par jour = ', data);
+      });
+    }
+  }
+  
+  
 }
 
 

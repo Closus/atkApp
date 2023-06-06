@@ -8,9 +8,6 @@ export class UserService {
 
   private apiUrl = 'http://geo.autotracking.eu/api.action';
 
-  private getTripByIdUrl = 'http://geo.autotracking.eu/api.action?gettrip';
-  private getTripByDateUrl = 'http://geo.autotracking.eu/api.action?gettrip';
-
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type':  'application/x-www-form-urlencoded'
@@ -35,13 +32,12 @@ export class UserService {
     return this.http.get(this.apiUrl + '?' + param +'&token=7254941903' + '&uuid=' + this.userDetails.uuid);
   }
 
-  getTripById() {
-    return this.http.get(this.getTripByIdUrl + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + this.tracking.tracker);
+  getTripById(param : string, id: number) {
+    return this.http.get(this.apiUrl + '?' + param + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + id);
   }
 
-  // date a modifier selon choix ou date du jour par default
-  getTripByDate() {
-    return this.http.get(this.getTripByDateUrl + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + this.tracking.tracker + "&date=" + this.tracking.date);
+  getTripByDate(param : string, id: number, date: string) {
+    return this.http.get(this.apiUrl + '?' + param + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + id + "&trackerdate=" + date);
   }
 
   reverseGeocode(latitude: any, longitude: any){
