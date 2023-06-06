@@ -1,4 +1,4 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, ViewChild } from '@angular/core';
 import { IonicModule, MenuController, ModalController, NavController } from '@ionic/angular';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
 import { UserService } from '../api/user.service';
@@ -21,6 +21,7 @@ import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } f
 })
 
 export class HomePage implements AfterViewInit {
+  @ViewChild(BaliseComponent) baliseComponent!: BaliseComponent; // Access the BaliseComponent instance
   map: L.Map | undefined;
   email: string | undefined;
   name: string | undefined;
@@ -45,7 +46,6 @@ export class HomePage implements AfterViewInit {
               public modalController: ModalController, 
               private userService: UserService, 
               private navController: NavController,
-              private balise : BaliseComponent
               ) {}
 
   ngOnInit() {
@@ -72,15 +72,9 @@ export class HomePage implements AfterViewInit {
         this.pageTitle = 'Accueil';
       }
       this.updateSelectedMarker();
-
-      // Appel API toutes les 60 secondes
-      // interval(60000)
-      // .pipe(switchMap(() => this.userService.getAPI('getpositions')))
-      // .subscribe((response: any) => {
-      //   this.userService.positions = response.trackinglist;
-      //   console.log('refresh 60 secondes');
-      //   this.updateSelectedMarker();
-      // });
+      setInterval(() => {
+        this.updateSelectedMarker();
+      }, 60000);
     })
   }
   
@@ -182,6 +176,7 @@ export class HomePage implements AfterViewInit {
         this.map?.removeLayer(layer);
       }
     });
+    console.log('refreshhhhh');
   
     const selected = this.selectedItem.getValue();
   
@@ -204,6 +199,7 @@ export class HomePage implements AfterViewInit {
     const modal = await this.modalController.create({
       component: BaliseComponent
     });
+    this.clearMap();
     modal.onDidDismiss().then((data) => {
       this.selectedItem.next(data.data);
       this.selectedTracker = data.data;
