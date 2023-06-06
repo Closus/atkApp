@@ -29,6 +29,17 @@ export class HomePage implements AfterViewInit {
   pageTitle: string = 'Accueil';  
   selectedDate: string | undefined;
   numberDate: string | undefined;
+  selectedTracker: any = null;
+  markers: L.Marker[] = [];
+  tripData: any;
+  tripDataDate: any;
+  customIcon = L.icon({
+    iconUrl: '../../assets/images/test.png',
+    iconSize: [25, 25]});
+  finishIcon = L.icon({
+    iconUrl: '../../assets/images/finish.png',
+    iconSize: [25, 25]
+  });
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -39,11 +50,6 @@ export class HomePage implements AfterViewInit {
 
   ngOnInit() {
     this.menu.swipeGesture(false);
-    let customIcon = L.icon({
-      iconUrl: '../../assets/images/test.png',
-    
-      iconSize:     [25, 25], // size of the icon
-    });
     // Vérifier si un élément est sélectionné
     this.selectedItem.subscribe((selected: any) => {
       console.log('SELECTED',selected);
@@ -68,22 +74,17 @@ export class HomePage implements AfterViewInit {
       this.updateSelectedMarker();
 
       // Appel API toutes les 60 secondes
-      interval(60000)
-      .pipe(switchMap(() => this.userService.getAPI('getpositions')))
-      .subscribe((response: any) => {
-        this.userService.positions = response.trackinglist;
-        console.log('refresh 60 secondes');
-        this.updateSelectedMarker();
-      });
+      // interval(60000)
+      // .pipe(switchMap(() => this.userService.getAPI('getpositions')))
+      // .subscribe((response: any) => {
+      //   this.userService.positions = response.trackinglist;
+      //   console.log('refresh 60 secondes');
+      //   this.updateSelectedMarker();
+      // });
     })
   }
   
   ngAfterViewInit(): void {
-    let customIcon = L.icon({
-      iconUrl: '../../assets/images/test.png',
-    
-      iconSize:     [25, 25], // size of the icon
-    });
     if (this.userService.userDetails) {
       this.email = this.userService.userDetails.email;
       this.name = this.userService.userDetails.name;
@@ -175,20 +176,29 @@ export class HomePage implements AfterViewInit {
   // }
 
   updateSelectedMarker(): void {
-    const selected = this.selectedItem.getValue();
-    if (selected && selected.positionData.position && selected.marker) {
-      selected.marker.setLatLng([
-        selected.positionData.position.latitude,
-        selected.positionData.position.longitude,
-      ]);
-  
-      selected.marker.setPopupContent(`<p>${selected.trackerData.name}</p>`);
-  
-      if (!this.map?.hasLayer(selected.marker)) {
-        this.map?.addLayer(selected.marker);
+    // Remove all existing markers from the map
+    this.map?.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        this.map?.removeLayer(layer);
       }
+    });
+  
+    const selected = this.selectedItem.getValue();
+  
+    if (selected && selected.positionData.position) {
+      const customIcon = L.icon({
+        iconUrl: '../../assets/images/test.png',
+        iconSize: [25, 25],
+      });
+  
+      const marker = L.marker(
+        [selected.positionData.position.latitude, selected.positionData.position.longitude],
+        { icon: customIcon }
+      );
+      marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+      this.map?.addLayer(marker);
     }
-  }  
+  }
   
   async presentModal() {
     const modal = await this.modalController.create({
@@ -196,6 +206,7 @@ export class HomePage implements AfterViewInit {
     });
     modal.onDidDismiss().then((data) => {
       this.selectedItem.next(data.data);
+      this.selectedTracker = data.data;
     })
     return await modal.present();
   }
@@ -249,18 +260,67 @@ export class HomePage implements AfterViewInit {
   selectedTrip() {
     this.userService.getTripById('gettrip', this.selectedItem.value.trackerData.id).subscribe((data: any) => {
       console.log('data du trip = ', data);
+      this.tripData = data;
     });
   }
 
   selectedDateTrip() {
     if (this.numberDate) {
-      this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id,this.numberDate).subscribe((data: any) => {
+      this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id, this.numberDate).subscribe((data: any) => {
         console.log('data du trip par jour = ', data);
+        this.tripDataDate = data;
+  
+        if (this.tripDataDate && this.tripDataDate.tracking && this.tripDataDate.tracking.trips && this.tripDataDate.tracking.trips.length > 0) {
+          const tripCoordinates: L.LatLng[][] = [];
+          let stepNumber = 1; // Compteur de numéro d'étape
+  
+          this.tripDataDate.tracking.trips.forEach((trip: any) => {
+            const tripSteps: L.LatLng[] = [];
+          
+            trip.steps.forEach((step: any) => {
+              const latitude = parseFloat(step.latitude);
+              const longitude = parseFloat(step.longitude);
+          
+              if (!isNaN(latitude) && !isNaN(longitude)) {
+                const coordinate = L.latLng(latitude, longitude);
+                tripSteps.push(coordinate);
+              }
+            });
+          
+            if (tripSteps.length > 0) {
+              tripCoordinates.push(tripSteps);
+          
+              if (this.map) {
+                const stepMarker = L.marker(tripSteps[0], { icon: this.finishIcon }).addTo(this.map);
+                stepMarker.bindPopup(`Étape ${stepNumber}`);
+                stepNumber++;
+              }
+            }
+          });
+  
+          if (this.map) {
+            const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
+  
+            const startMarker = L.marker(tripCoordinates[0][0], { icon: this.finishIcon }).addTo(this.map);
+            startMarker.bindPopup('Départ');
+  
+            const endMarker = L.marker(tripCoordinates[tripCoordinates.length - 1][tripCoordinates.length - 1], { icon: this.finishIcon }).addTo(this.map);
+            endMarker.bindPopup('Arrivée');
+          }
+        }
       });
     }
   }
   
-  
+  clearMap() {
+    if (this.map) {
+      this.map.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+          this.map?.removeLayer(layer);
+        }
+      });
+    }
+  }
 }
 
 
