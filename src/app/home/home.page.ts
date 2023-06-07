@@ -5,7 +5,7 @@ import { UserService } from '../api/user.service';
 import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { first, interval } from 'rxjs';
-import { switchMap } from 'rxjs/operators';
+import { TripListModalComponent } from '../modals/trip-list-modal/trip-list-modal.component';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
 import { forkJoin } from 'rxjs';
 import { BehaviorSubject } from 'rxjs';
@@ -33,13 +33,15 @@ export class HomePage implements AfterViewInit {
   selectedTracker: any = null;
   markers: L.Marker[] = [];
   tripData: any;
-  tripDataDate: any;
+  tripDataDate : any;
+  addressData: any = {};
+  previousCoordinates: L.LatLng | null = null;
   customIcon = L.icon({
     iconUrl: '../../assets/images/test.png',
     iconSize: [25, 25]});
   finishIcon = L.icon({
     iconUrl: '../../assets/images/finish.png',
-    iconSize: [25, 25]
+    iconSize: [35, 35]
   });
 
   constructor(private menu: MenuController, 
@@ -52,19 +54,14 @@ export class HomePage implements AfterViewInit {
     this.menu.swipeGesture(false);
     // Vérifier si un élément est sélectionné
     this.selectedItem.subscribe((selected: any) => {
-      console.log('SELECTED',selected);
+      console.log('SELECTED', selected);
       if (selected) {
         this.pageTitle = selected.trackerData.name;
 
         if (!selected.marker) {
-          const customIcon = L.icon({
-            iconUrl: '../../assets/images/test.png',
-            iconSize: [25, 25],
-          });
-    
           selected.marker = L.marker(
             [selected.positionData.position.latitude, selected.positionData.position.longitude],
-            { icon: customIcon }
+            { icon: this.customIcon }
           );
           selected.marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
         }
@@ -72,10 +69,7 @@ export class HomePage implements AfterViewInit {
         this.pageTitle = 'Accueil';
       }
       this.updateSelectedMarker();
-      setInterval(() => {
-        this.updateSelectedMarker();
-      }, 60000);
-    })
+    });
   }
   
   ngAfterViewInit(): void {
@@ -146,29 +140,6 @@ export class HomePage implements AfterViewInit {
     this.navController.navigateRoot('login');
   }
 
-  // updateMapMarkers(): void {
-  //   let customIcon = L.icon({
-  //     iconUrl: '../../assets/images/test.png',
-    
-  //     iconSize:     [25, 25], // size of the icon
-  //   });
-  //   // Effacer tous les marqueurs existants sur la carte
-  //   this.map?.eachLayer((layer) => {
-  //     if (layer instanceof L.Marker) {
-  //       this.map?.removeLayer(layer);
-  //     }
-  //   });
-  
-  //   // Ajoutez les marqueurs à la carte pour chaque élément dans combinedData
-  //   this.userService.combinedData.forEach((data: any) => {
-  //     if ( data.positionData.position) {
-  //       const markPoint = L.marker([data.positionData.position.latitude, data.positionData.position.longitude], { icon: customIcon });
-  //       markPoint.bindPopup(`<p>${data.trackerData.name}</p>`);
-  //       this.map?.addLayer(markPoint);
-  //     }
-  //   });
-  // }
-
   updateSelectedMarker(): void {
     // Remove all existing markers from the map
     this.map?.eachLayer((layer) => {
@@ -186,14 +157,21 @@ export class HomePage implements AfterViewInit {
         iconSize: [25, 25],
       });
   
-      const marker = L.marker(
-        [selected.positionData.position.latitude, selected.positionData.position.longitude],
-        { icon: customIcon }
-      );
-      marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
-      this.map?.addLayer(marker);
+      const coordinates = L.latLng(selected.positionData.position.latitude, selected.positionData.position.longitude);
+  
+      // Vérifiez si les coordonnées ont changé
+      if (!this.previousCoordinates || !this.previousCoordinates.equals(coordinates)) {
+        // Créez un nouveau marker avec les nouvelles coordonnées
+        const marker = L.marker(coordinates, { icon: customIcon });
+        marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+        this.map?.addLayer(marker);
+  
+        // Mettez à jour les coordonnées précédentes
+        this.previousCoordinates = coordinates;
+      }
     }
   }
+  
   
   async presentModal() {
     const modal = await this.modalController.create({
@@ -263,15 +241,19 @@ export class HomePage implements AfterViewInit {
   selectedDateTrip() {
     if (this.numberDate) {
       this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id, this.numberDate).subscribe((data: any) => {
-        console.log('data du trip par jour = ', data);
         this.tripDataDate = data;
   
         if (this.tripDataDate && this.tripDataDate.tracking && this.tripDataDate.tracking.trips && this.tripDataDate.tracking.trips.length > 0) {
           const tripCoordinates: L.LatLng[][] = [];
           let stepNumber = 1; // Compteur de numéro d'étape
   
-          this.tripDataDate.tracking.trips.forEach((trip: any) => {
+          this.tripDataDate.tracking.trips.forEach((trip: any, index :any) => {
             const tripSteps: L.LatLng[] = [];
+            this.userService.reverseGeocode(trip.steps[0].latitude, trip.steps[0].longitude).pipe(first()).subscribe((address: any = {}) => {
+              if (this.addressData) {
+                this.tripDataDate.tracking.trips[index].address = address;
+              }
+            })
           
             trip.steps.forEach((step: any) => {
               const latitude = parseFloat(step.latitude);
@@ -293,7 +275,7 @@ export class HomePage implements AfterViewInit {
               }
             }
           });
-  
+          console.log('data du trip par jour = ', this.tripDataDate);
           if (this.map) {
             const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
   
@@ -306,6 +288,16 @@ export class HomePage implements AfterViewInit {
         }
       });
     }
+  }
+
+  async openTripListModal() {
+    const modal = await this.modalController.create({
+      component: TripListModalComponent,
+      componentProps: {
+        trips: this.tripDataDate.tracking.trips
+      }
+    });
+    return await modal.present();
   }
   
   clearMap() {

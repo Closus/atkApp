@@ -43,7 +43,9 @@
     <span class="itinerary" (click)="launchNavigation()"><fa-icon icon="location-arrow"></fa-icon></span>
   </div>
   <ion-content>
-    <div id="mapId" class="map">
-    </div>
+    <div id="mapId" class="map"></div>
+    <ion-button expand="full" class="menu-button" (click)="openTripListModal()">
+      <ion-icon name="menu"></ion-icon>
+    </ion-button>
   </ion-content>
 </div>
