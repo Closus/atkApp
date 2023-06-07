@@ -1,18 +1,20 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Liste des trips</ion-title>
+  <ion-toolbar style="--background: #EC851E;">
+    <ion-title style="color: white;">Liste des trips</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="closeModal()">
+      <ion-button style="color: white;" (click)="closeModal()">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <ion-list>
-    <ion-item *ngFor="let trip of trips">
+<ion-content style="--background: black;">
+  <ion-list style="background: black;">
+    <ion-item *ngFor="let trip of trips" style="--background: black;border-bottom: solid 1px #EC851E;">
+      <ion-label style="color: white;">
       {{ trip.address.features[0].properties.display_name }}
+      </ion-label>
     </ion-item>
   </ion-list>
 </ion-content>
