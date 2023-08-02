@@ -20,23 +20,40 @@ export class LoginPage implements OnInit {
 
   email!: string;
   password!: string;
+  saveInfo!: boolean;
 
   login() {
-    this.userService.login('atk@autotracking.eu', 'atk25800').pipe(first()).subscribe((response: any) => {
-      const uuid = response.user.uuid;
-      console.log(response);
-      console.log("----------");
-      console.log(uuid);
-      this.userService.userDetails = response.user;
-      this.navController.navigateRoot('home');
+    if (this.email === 'atk@autotracking.eu' && this.password === 'atk25800') {
+      this.userService.login(this.email, this.password).pipe(first()).subscribe((response: any) => {
+        const uuid = response.user.uuid;
+        console.log(response);
+        console.log("----------");
+        console.log(uuid);
+        this.userService.userDetails = response.user;
+        if (this.saveInfo) {
+          localStorage.setItem('savedEmail', this.email);
+          localStorage.setItem('savedPassword', this.password);
+        }
+        this.navController.navigateRoot('home');
       }),
       catchError((error) => {
         console.log(error);
         throw error;
       });
+    } else {
+      console.log('Invalid email or password');
+      // Handle invalid email or password here
+    }
   }
 
   ngOnInit() {
+    const savedEmail = localStorage.getItem('savedEmail');
+    const savedPassword = localStorage.getItem('savedPassword');
+
+    if (savedEmail && savedPassword) {
+      this.email = savedEmail;
+      this.password = savedPassword;
+    }
   }
 
   goToHomePage() {

@@ -158,6 +158,7 @@ export class HomePage implements AfterViewInit {
       });
   
       const coordinates = L.latLng(selected.positionData.position.latitude, selected.positionData.position.longitude);
+      //const accuracy = L.circle(coordinates, { color: 'red', fillColor: 'red', fillOpacity: 0.3, radius: 50 }).addTo(this.map!);
   
       // Vérifiez si les coordonnées ont changé
       if (!this.previousCoordinates || !this.previousCoordinates.equals(coordinates)) {

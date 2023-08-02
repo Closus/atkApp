@@ -21,8 +21,9 @@
     </div>
     <form action="">
       <div class="input-container">
-        <ion-input type="text" expand="block" label="" placeholder="Email"></ion-input>
-        <ion-input type="password" expand="block" placeholder="Password" label=""></ion-input>
+        <ion-input type="email" expand="block" label="" placeholder="Email" [(ngModel)]="email" name="email"></ion-input>
+        <ion-input type="password" expand="block" placeholder="Password" label="" [(ngModel)]="password" name="password"></ion-input>
+        <ion-checkbox [(ngModel)]="saveInfo" style="color: #EC851E; display: flex;" name="saveInfo">Se souvenir ?</ion-checkbox>
       </div>     
     </form>
     <div class="buttons-container">
