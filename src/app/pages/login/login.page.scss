@@ -39,6 +39,9 @@ ion-content {
 
 .logo {
   margin-bottom: 20px;
+  //nouveau
+  display: flex;
+  justify-content: center;
 }
 
 .input-container {
@@ -56,6 +59,11 @@ ion-input {
   margin-left: 2vw;
 }
 
+img {
+  max-width: 100%;
+  width: 250px;
+  height: 250px;
+}
 
 ion-button {
   margin-top: 20px;

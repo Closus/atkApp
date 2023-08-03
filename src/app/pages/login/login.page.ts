@@ -23,27 +23,26 @@ export class LoginPage implements OnInit {
 
   email!: string;
   password!: string;
+  loginError: boolean = false;
 
   login() {
-    if (this.email === 'atk@autotracking.eu' && this.password === 'atk25800') {
-      this.userService.login(this.email, this.password).pipe(first()).subscribe((response: any) => {
+    this.userService.login(this.email, this.password).pipe(first()).subscribe((response: any) => {
+      console.log(response);
+      if (response.status === 501) {
+        console.log('response', response);
         const uuid = response.user.uuid;
-        console.log(response);
+        console.log('response2' , response);
         console.log("----------");
         console.log(uuid);
+        console.log(this.userService)
         this.userService.userDetails = response.user;
           localStorage.setItem('savedEmail', this.email);
           localStorage.setItem('savedPassword', this.password);
           this.navController.navigateRoot('home');
-        }),
-        catchError((error) => {
-          console.log(error);
-          throw error;
-        });
-    } else {
-      console.log('Invalid email or password');
-      // Handle invalid email or password here
-    }
+      } else {
+        this.loginError = true;
+      }
+    });
   }
 
   ngOnInit() {
@@ -60,5 +59,4 @@ export class LoginPage implements OnInit {
   goToHomePage() {
     this.login();
   }
-
 }
