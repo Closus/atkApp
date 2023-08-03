@@ -211,8 +211,9 @@ export class HomePage implements AfterViewInit {
   }  
 
   async openCalendar() {
+    this.clearMap();
     const options: CalendarModalOptions = {
-      color: 'dark', // Couleur du calendrier (noir)
+      color: 'dark', // Couleur du calendrier (noir),
       title: 'Sélectionnez une date', // Titre du calendrier
       canBackwardsSelected: true, // Autorise la sélection de dates antérieures
       defaultDate: this.selectedDate ? new Date(this.selectedDate) : new Date() // Date par défaut (la date sélectionnée ou la date actuelle)
@@ -361,7 +362,7 @@ export class HomePage implements AfterViewInit {
   clearMap() {
     if (this.map) {
       this.map.eachLayer((layer: any) => {
-        if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+        if (layer instanceof L.Marker || layer instanceof L.Polyline || layer instanceof L.CircleMarker) {
           this.map?.removeLayer(layer);
         }
       });
