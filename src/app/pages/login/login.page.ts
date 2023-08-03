@@ -16,11 +16,13 @@ import { catchError, first } from 'rxjs';
 })
 export class LoginPage implements OnInit {
 
-  constructor(private navController: NavController, private userService: UserService) { }
+  constructor(private navController: NavController, private userService: UserService) {
+    this.email = '';
+    this.password = '';
+   }
 
   email!: string;
   password!: string;
-  saveInfo!: boolean;
 
   login() {
     if (this.email === 'atk@autotracking.eu' && this.password === 'atk25800') {
@@ -30,16 +32,14 @@ export class LoginPage implements OnInit {
         console.log("----------");
         console.log(uuid);
         this.userService.userDetails = response.user;
-        if (this.saveInfo) {
           localStorage.setItem('savedEmail', this.email);
           localStorage.setItem('savedPassword', this.password);
-        }
-        this.navController.navigateRoot('home');
-      }),
-      catchError((error) => {
-        console.log(error);
-        throw error;
-      });
+          this.navController.navigateRoot('home');
+        }),
+        catchError((error) => {
+          console.log(error);
+          throw error;
+        });
     } else {
       console.log('Invalid email or password');
       // Handle invalid email or password here
@@ -53,6 +53,7 @@ export class LoginPage implements OnInit {
     if (savedEmail && savedPassword) {
       this.email = savedEmail;
       this.password = savedPassword;
+      this.login();
     }
   }
 

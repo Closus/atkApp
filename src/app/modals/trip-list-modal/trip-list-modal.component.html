@@ -11,7 +11,7 @@
 
 <ion-content style="--background: black;">
   <ion-list style="background: black;">
-    <ion-item *ngFor="let trip of trips" style="--background: black;border-bottom: solid 1px #EC851E;">
+    <ion-item *ngFor="let trip of trips" (click)="centerMapOnLabel(trip)" style="--background: black;border-bottom: solid 1px #EC851E;">
       <ion-label style="color: white;">
       {{ trip.address.features[0].properties.display_name }}
       </ion-label>

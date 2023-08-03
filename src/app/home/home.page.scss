@@ -99,3 +99,10 @@ span {
   left: 5px;
   z-index: 1000;
 }
+
+.leaflet-tooltip-own {
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px;
+}

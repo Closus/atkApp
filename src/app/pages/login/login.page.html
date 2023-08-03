@@ -23,12 +23,11 @@
       <div class="input-container">
         <ion-input type="email" expand="block" label="" placeholder="Email" [(ngModel)]="email" name="email"></ion-input>
         <ion-input type="password" expand="block" placeholder="Password" label="" [(ngModel)]="password" name="password"></ion-input>
-        <ion-checkbox [(ngModel)]="saveInfo" style="color: #EC851E; display: flex;" name="saveInfo">Se souvenir ?</ion-checkbox>
       </div>     
     </form>
     <div class="buttons-container">
-      <ion-button color="success" expand="block" shape="round" size="large" (click)="goToHomePage()">Confirm</ion-button>
-      <ion-button color="danger" expand="block" shape="round" size="large">Cancel</ion-button>
+      <ion-button color="success" expand="block" shape="round" size="medium" (click)="goToHomePage()">Confirm</ion-button>
+      <ion-button color="danger" expand="block" shape="round" size="medium">Cancel</ion-button>
     </div>
   </div>
 </ion-content>

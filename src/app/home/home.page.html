@@ -26,7 +26,7 @@
       <ion-buttons slot="start">
         <ion-menu-button style="color: white;"></ion-menu-button>
       </ion-buttons>
-      <ion-title>{{ pageTitle }}</ion-title>
+        <ion-title>{{ pageTitle }}</ion-title>
     </ion-toolbar>
   </ion-header>
   <div class="menu-items">
@@ -47,5 +47,6 @@
     <ion-button expand="full" class="menu-button" (click)="openTripListModal()" color="success">
       <ion-icon name="menu"></ion-icon>
     </ion-button>
+    <app-trip-list-modal (labelSelected)="onLabelSelected($event)"></app-trip-list-modal>
   </ion-content>
 </div>

@@ -13,11 +13,11 @@ import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } f
 
 
 @Component({
-  selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
-  standalone: true,
-  imports: [IonicModule, FontAwesomeModule, CalendarModule, CommonModule]
+    selector: 'app-home',
+    templateUrl: 'home.page.html',
+    styleUrls: ['home.page.scss'],
+    standalone: true,
+    imports: [IonicModule, FontAwesomeModule, CalendarModule, CommonModule, TripListModalComponent]
 })
 
 export class HomePage implements AfterViewInit {
@@ -137,6 +137,8 @@ export class HomePage implements AfterViewInit {
   }
 
   disconnect() {
+    localStorage.removeItem('savedEmail');
+    localStorage.removeItem('savedPassword');
     this.navController.navigateRoot('login');
   }
 
@@ -182,7 +184,16 @@ export class HomePage implements AfterViewInit {
     modal.onDidDismiss().then((data) => {
       this.selectedItem.next(data.data);
       this.selectedTracker = data.data;
-    })
+  
+      // Ajouter la condition pour vérifier si la date sélectionnée est antérieure à la date actuelle
+      if (!this.numberDate || new Date(this.numberDate) < new Date()) {
+        const currentDate = new Date();
+        const day = currentDate.getDate().toString().padStart(2, '0');
+        const month = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = currentDate.getFullYear().toString();
+        this.numberDate = year + month + day;
+      }
+    });
     return await modal.present();
   }
 
@@ -270,7 +281,21 @@ export class HomePage implements AfterViewInit {
               tripCoordinates.push(tripSteps);
           
               if (this.map) {
-                const stepMarker = L.marker(tripSteps[0], { icon: this.finishIcon }).addTo(this.map);
+                const stepMarker = L.circleMarker(tripSteps[0], {
+                  radius: 10, // Adjust the radius as needed
+                  color: 'red', // Adjust the color as needed
+                  fillColor: 'red', // Adjust the fill color as needed
+                  fillOpacity: 1, // Adjust the fill opacity as needed
+                }).addTo(this.map);
+
+                stepMarker.bindTooltip(`${stepNumber}`, {
+                permanent: true,
+                direction: 'center',
+                className: 'step-marker-tooltip', // Ajoutez une classe CSS personnalisée pour le style
+                opacity: 0.3
+                });
+
+
                 stepMarker.bindPopup(`Étape ${stepNumber}`);
                 stepNumber++;
               }
@@ -280,10 +305,22 @@ export class HomePage implements AfterViewInit {
           if (this.map) {
             const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
   
-            const startMarker = L.marker(tripCoordinates[0][0], { icon: this.finishIcon }).addTo(this.map);
+            const startMarker = L.circleMarker(tripCoordinates[0][0], {
+              radius: 10, // Ajustez le rayon selon vos besoins
+              color: 'green', // Ajustez la couleur selon vos besoins
+              fillColor: 'green', // Ajustez la couleur de remplissage selon vos besoins
+              fillOpacity: 1 // Ajustez l'opacité de remplissage selon vos besoins
+            }).addTo(this.map);
+            
             startMarker.bindPopup('Départ');
-  
-            const endMarker = L.marker(tripCoordinates[tripCoordinates.length - 1][tripCoordinates.length - 1], { icon: this.finishIcon }).addTo(this.map);
+            
+            const endMarker = L.circleMarker(tripCoordinates[tripCoordinates.length - 1][tripCoordinates.length - 1], {
+              radius: 10, // Ajustez le rayon selon vos besoins
+              color: 'black', // Ajustez la couleur selon vos besoins
+              fillColor: 'black', // Ajustez la couleur de remplissage selon vos besoins
+              fillOpacity: 1 // Ajustez l'opacité de remplissage selon vos besoins
+            }).addTo(this.map);
+            
             endMarker.bindPopup('Arrivée');
           }
         }
@@ -298,7 +335,27 @@ export class HomePage implements AfterViewInit {
         trips: this.tripDataDate.tracking.trips
       }
     });
+
+    modal.onDidDismiss().then((result) => {
+      if (result && result.data) {
+        this.onLabelSelected(result.data);
+        console.log(result.data);
+      }
+    })
     return await modal.present();
+  }
+
+  onLabelSelected(label: string) {
+    const selectedTrip = this.tripDataDate.tracking.trips.find((trip: any) => trip.address.features[0].properties.display_name === label);
+    console.log('selectedTrip = ', selectedTrip, 'ici')
+    if (selectedTrip) {
+      const latitude = parseFloat(selectedTrip.steps[0].latitude);
+      const longitude = parseFloat(selectedTrip.steps[0].longitude);
+      if (!isNaN(latitude) && !isNaN(longitude)) {
+        const coordinates = L.latLng(latitude, longitude);
+        this.map?.setView(coordinates, 15, { animate: true });
+      }
+    }
   }
   
   clearMap() {
