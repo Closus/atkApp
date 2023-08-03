@@ -64,3 +64,20 @@ ion-button {
 .container-form {
   display: flex;
 }
+
+.linkDiv {
+  display: flex;
+  justify-content: center;
+}
+
+.link {
+  color: white;
+  margin-top: 20%;
+}
+
+a {
+  color: #EC851E;
+}
+a:link {
+  text-decoration: none;
+}
