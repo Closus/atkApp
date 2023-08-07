@@ -137,6 +137,7 @@ export class HomePage implements AfterViewInit {
               const marker = L.marker(coordinates).addTo(this.map);
               const markerElement = marker.getElement();
               if (markerElement) {
+                markerElement.style.transition = 'none';
                 markerElement.style.transform = `rotate(${heading}deg)`;
                 // Supprimez la classe 'no-transition' de l'élément du marqueur
                 markerElement.classList.remove('no-transition');
@@ -291,7 +292,7 @@ export class HomePage implements AfterViewInit {
             this.map?.removeLayer(layer);
           }
         });
-        
+
         // Ajoutez le marqueur avec la bonne position de heading
         const heading = this.selectedItem.value.positionData.position.heading;
         const coordinates: L.LatLngTuple = [selectedPosition.latitude, selectedPosition.longitude];
