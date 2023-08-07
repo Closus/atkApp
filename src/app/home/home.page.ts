@@ -39,7 +39,7 @@ export class HomePage implements AfterViewInit {
   customIcon = L.icon({
     iconUrl: '../../assets/images/logoMarker.png',
     iconSize: [80, 80],
-    iconAnchor: [40, 80],
+    iconAnchor: [10, 80],
     className: 'rotate-icon'
   });
   finishIcon = L.icon({
@@ -234,12 +234,23 @@ export class HomePage implements AfterViewInit {
     });
   
     if (selected && selected.positionData.position) {
-      const customIcon = L.icon({
+      let customIcon;
+
+      if (selected.positionData.position.heading === '0.0') {
+      // Utilisez un autre marqueur si le heading est égal à 0.0
+      customIcon = L.icon({
+        iconUrl: '../../assets/images/Logo Stop.png', // Remplacez par l'URL de votre autre marqueur
+        iconSize: [100, 100],
+        iconAnchor: [10, 80],
+      });
+    } else {
+      customIcon = L.icon({
         iconUrl: '../../assets/images/logoMarker.png',
         iconSize: [80, 80],
-        iconAnchor: [40, 80],
+        iconAnchor: [10, 80],
         className: 'rotate-icon' // Ajoutez une classe pour la rotation
       });
+    }
   
       const coordinates = L.latLng(selected.positionData.position.latitude, selected.positionData.position.longitude);
   
@@ -423,41 +434,40 @@ export class HomePage implements AfterViewInit {
           this.tripDataDate.tracking.trips.forEach((trip: any, index :any) => {
             const tripSteps: L.LatLng[] = [];
             this.userService.reverseGeocode(trip.steps[0].latitude, trip.steps[0].longitude).pipe(first()).subscribe((address: any = {}) => {
-                          if (this.addressData) {
-                            this.tripDataDate.tracking.trips[index].address = address;
-                          }
-                        })
-                        trip.steps.forEach((step: any) => {
-                          const latitude = parseFloat(step.latitude);
-                          const longitude = parseFloat(step.longitude);
-                      
-                          if (!isNaN(latitude) && !isNaN(longitude)) {
-                            const coordinate = L.latLng(latitude, longitude);
-                            tripSteps.push(coordinate);
-                          }
-                        }); 
+              if (this.addressData) {
+                this.tripDataDate.tracking.trips[index].address = address;
+              }
+            })
+            trip.steps.forEach((step: any) => {
+              const latitude = parseFloat(step.latitude);
+              const longitude = parseFloat(step.longitude);
+          
+              if (!isNaN(latitude) && !isNaN(longitude)) {
+                const coordinate = L.latLng(latitude, longitude);
+                tripSteps.push(coordinate);
+              }
+            }); 
   
             if (tripSteps.length > 0) {
               tripCoordinates.push(tripSteps);
   
               if (this.map) {
                 const stepMarker = L.circleMarker(tripSteps[0], {
-                                  radius: 10, // Adjust the radius as needed
-                                  color: 'red', // Adjust the color as needed
-                                  fillColor: 'red', // Adjust the fill color as needed
-                                  fillOpacity: 1, // Adjust the fill opacity as needed
-                                }).addTo(this.map);
-                
-                                stepMarker.bindTooltip(`${stepNumber}`, {
-                                permanent: true,
-                                direction: 'center',
-                                className: 'step-marker-tooltip', // Ajoutez une classe CSS personnalisée pour le style
-                                opacity: 0.3
-                                });
-                
-                
-                                stepMarker.bindPopup(`Étape ${stepNumber}`);
-                                stepNumber++;
+                  radius: 10, // Adjust the radius as needed
+                  color: 'black', // Adjust the color as needed
+                  fillColor: 'white', // Adjust the fill color as needed
+                  fillOpacity: 1, // Adjust the fill opacity as needed
+                }).addTo(this.map);
+
+                stepMarker.bindTooltip(`${stepNumber}`, {
+                permanent: true,
+                direction: 'center',
+                className: 'step-marker-tooltip', // Ajoutez une classe CSS personnalisée pour le style
+                opacity: 0.3
+                });
+
+                stepMarker.bindPopup(`Étape ${stepNumber}`);
+                stepNumber++;
   
                 const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
               }
