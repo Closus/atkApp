@@ -31,7 +31,6 @@ export class LoginPage implements OnInit {
       if (response.status === 501) {
         console.log('response', response);
         const uuid = response.user.uuid;
-        console.log('response2' , response);
         console.log("----------");
         console.log(uuid);
         console.log(this.userService)

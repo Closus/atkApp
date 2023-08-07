@@ -26,7 +26,9 @@
       <ion-buttons slot="start">
         <ion-menu-button style="color: white;"></ion-menu-button>
       </ion-buttons>
-        <ion-title>{{ pageTitle }}</ion-title>
+      <div style="white-space: nowrap; overflow: auto; text-align: center; color: white;">
+        {{ pageTitle }}
+      </div>
     </ion-toolbar>
   </ion-header>
   <div class="menu-items">
@@ -44,9 +46,14 @@
   </div>
   <ion-content>
     <div id="mapId" class="map"></div>
-    <ion-button expand="full" class="menu-button" (click)="openTripListModal()" color="success">
+    <ion-button *ngIf="isTripSelected" expand="full" class="menu-button" (click)="openTripListModal()" color="success">
       <ion-icon name="menu"></ion-icon>
     </ion-button>
+    <div class="custom-marker">
+      <div class="outer-circle"></div>
+      <div class="inner-circle"></div>
+      <div class="flashlight"></div>
+    </div>
     <app-trip-list-modal (labelSelected)="onLabelSelected($event)"></app-trip-list-modal>
   </ion-content>
 </div>

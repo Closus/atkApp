@@ -37,12 +37,16 @@ export class HomePage implements AfterViewInit {
   addressData: any = {};
   previousCoordinates: L.LatLng | null = null;
   customIcon = L.icon({
-    iconUrl: '../../assets/images/test.png',
-    iconSize: [25, 25]});
+    iconUrl: '../../assets/images/logoMarker.png',
+    iconSize: [80, 80],
+    iconAnchor: [40, 80],
+    className: 'rotate-icon'
+  });
   finishIcon = L.icon({
     iconUrl: '../../assets/images/finish.png',
     iconSize: [35, 35]
   });
+  isTripSelected: boolean = false;
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -52,23 +56,16 @@ export class HomePage implements AfterViewInit {
 
   ngOnInit() {
     this.menu.swipeGesture(false);
-    // Vérifier si un élément est sélectionné
-    this.selectedItem.subscribe((selected: any) => {
-      console.log('SELECTED', selected);
-      if (selected) {
-        this.pageTitle = selected.trackerData.name;
-
-        if (!selected.marker) {
-          selected.marker = L.marker(
-            [selected.positionData.position.latitude, selected.positionData.position.longitude],
-            { icon: this.customIcon }
-          );
-          selected.marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
-        }
-      } else {
-        this.pageTitle = 'Accueil';
-      }
-      this.updateSelectedMarker();
+  // Vérifier si un élément est sélectionné
+  this.selectedItem.subscribe((selected: any) => {
+    console.log('SELECTED', selected);
+    if (selected) {
+      this.pageTitle = selected.trackerData.name;
+      this.centerMap();
+      this.updateSelectedMarker(selected);
+    } else {
+      this.pageTitle = 'Accueil';
+    }
     });
   }
   
@@ -119,13 +116,42 @@ export class HomePage implements AfterViewInit {
           console.log('combinedData = ', this.userService.combinedData);
       
           this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
-          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);          
+          L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+
+          this.map.on('zoomstart', () => {
+            if (this.map) {
+              // Ajoutez la classe 'no-transition' à l'élément du marqueur
+              const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
+              const marker = L.marker(coordinates).addTo(this.map);
+              const markerElement = marker.getElement();
+              if (markerElement) {
+                markerElement.classList.add('no-transition');
+              }
+            }
+          });
+          this.map.on('zoomend', () => {
+            if (this.map) {
+              // Réinitialisez la rotation de l'icône du marqueur
+              const heading = this.selectedItem.value.positionData.position.heading;
+              const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
+              const marker = L.marker(coordinates).addTo(this.map);
+              const markerElement = marker.getElement();
+              if (markerElement) {
+                markerElement.style.transform = `rotate(${heading}deg)`;
+                // Supprimez la classe 'no-transition' de l'élément du marqueur
+                markerElement.classList.remove('no-transition');
+              }
+              // Mettez à jour la carte
+              this.updateMap();
+            }
+        });     
         } else {
           this.navController.navigateRoot('login');
         }
       });
-    }      
+    }  
   }
+
 
   openSideMenu() {
     this.menu.enable(true, 'myMenu');
@@ -142,35 +168,91 @@ export class HomePage implements AfterViewInit {
     this.navController.navigateRoot('login');
   }
 
-  updateSelectedMarker(): void {
-    // Remove all existing markers from the map
+  // updateSelectedMarker(): void {
+  //   const selected = this.selectedItem.getValue();
+  
+  //   if (selected && selected.positionData.position) {
+  //     const customIcon = L.icon({
+  //       iconUrl: '../../assets/images/logoMarker.png',
+  //       iconSize: [80, 80],
+  //       iconAnchor: [40, 80],
+  //       className: 'rotate-icon'
+  //     });
+  
+  //     const coordinates = L.latLng(selected.positionData.position.latitude, selected.positionData.position.longitude);
+  
+  //     // Vérifiez si les coordonnées ont changé
+  //     if (!this.previousCoordinates || !this.previousCoordinates.equals(coordinates)) {
+  //       // Supprimer tous les marqueurs existants de la carte
+  //       this.map?.eachLayer((layer) => {
+  //         if (layer instanceof L.Marker) {
+  //           this.map?.removeLayer(layer);
+  //         }
+  //       });
+  
+  //       // Créez un nouveau marqueur avec les nouvelles coordonnées
+  //       const marker = L.marker(coordinates, { icon: customIcon });
+  //       marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+  //       this.map?.addLayer(marker);
+  
+  //       // Faire pivoter le marqueur en fonction de l'attribut "heading"
+  //       const heading = selected.positionData.position.heading;
+  //       const markerElement = marker.getElement();
+  //       if (markerElement) {
+  //         markerElement.style.transform += `rotate(${heading}deg)`;
+  //       }
+  
+  //       // Mettez à jour les coordonnées précédentes
+  //       this.previousCoordinates = coordinates;
+  //     }
+  //   }
+  // }
+
+  updateMap(): void {
+    // Vérifiez si un élément est sélectionné
+    this.selectedItem.subscribe((selected: any) => {
+      if (selected) {
+        // Mettre à jour le titre de la page
+        this.pageTitle = selected.trackerData.name;
+  
+        // Mettre à jour le marqueur
+        this.updateSelectedMarker(selected);
+  
+      } else {
+        this.pageTitle = 'Accueil';
+      }
+    });
+  }
+  
+  updateSelectedMarker(selected: any): void {
+    // Supprimer tous les marqueurs existants de la carte
     this.map?.eachLayer((layer) => {
       if (layer instanceof L.Marker) {
         this.map?.removeLayer(layer);
       }
     });
-    console.log('refreshhhhh');
-  
-    const selected = this.selectedItem.getValue();
   
     if (selected && selected.positionData.position) {
       const customIcon = L.icon({
-        iconUrl: '../../assets/images/test.png',
-        iconSize: [25, 25],
+        iconUrl: '../../assets/images/logoMarker.png',
+        iconSize: [80, 80],
+        iconAnchor: [40, 80],
+        className: 'rotate-icon' // Ajoutez une classe pour la rotation
       });
   
       const coordinates = L.latLng(selected.positionData.position.latitude, selected.positionData.position.longitude);
-      //const accuracy = L.circle(coordinates, { color: 'red', fillColor: 'red', fillOpacity: 0.3, radius: 50 }).addTo(this.map!);
   
-      // Vérifiez si les coordonnées ont changé
-      if (!this.previousCoordinates || !this.previousCoordinates.equals(coordinates)) {
-        // Créez un nouveau marker avec les nouvelles coordonnées
-        const marker = L.marker(coordinates, { icon: customIcon });
-        marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
-        this.map?.addLayer(marker);
+      // Créez un nouveau marqueur avec les nouvelles coordonnées
+      const marker = L.marker(coordinates, { icon: customIcon });
+      marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+      this.map?.addLayer(marker);
   
-        // Mettez à jour les coordonnées précédentes
-        this.previousCoordinates = coordinates;
+      // Faire pivoter le marqueur en fonction de l'attribut "heading"
+      const heading = selected.positionData.position.heading;
+      const markerElement = marker.getElement();
+      if (markerElement) {
+        markerElement.style.transformOrigin = 'center bottom';
+        markerElement.style.transform += `rotate(${heading}deg)`;
       }
     }
   }
@@ -201,6 +283,25 @@ export class HomePage implements AfterViewInit {
     if (this.selectedItem.value && this.selectedItem.value.positionData.position) {
       const selectedPosition = this.selectedItem.value.positionData.position;
       this.map?.setView([selectedPosition.latitude, selectedPosition.longitude], 17, { animate: true });
+      
+      if (this.map) {
+        // Supprimez tous les marqueurs existants de la carte
+        this.map.eachLayer((layer) => {
+          if (layer instanceof L.Marker) {
+            this.map?.removeLayer(layer);
+          }
+        });
+        
+        // Ajoutez le marqueur avec la bonne position de heading
+        const heading = this.selectedItem.value.positionData.position.heading;
+        const coordinates: L.LatLngTuple = [selectedPosition.latitude, selectedPosition.longitude];
+        const marker = L.marker(coordinates, { icon: this.customIcon }).addTo(this.map);
+        const markerElement = marker.getElement();
+        if (markerElement) {
+          markerElement.style.transformOrigin = 'center bottom';
+          markerElement.style.transform += `rotate(${heading}deg)`;
+        }
+      }
     }
   }
 
@@ -251,7 +352,65 @@ export class HomePage implements AfterViewInit {
     });
   }
 
+  // selectedDateTrip() {
+  //   if (this.numberDate) {
+  //     this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id, this.numberDate).subscribe((data: any) => {
+  //       this.tripDataDate = data;
+  
+  //       if (this.tripDataDate && this.tripDataDate.tracking && this.tripDataDate.tracking.trips && this.tripDataDate.tracking.trips.length > 0) {
+  //         const tripCoordinates: L.LatLng[][] = [];
+  //         let stepNumber = 1; // Compteur de numéro d'étape
+  
+  //         this.tripDataDate.tracking.trips.forEach((trip: any, index :any) => {
+  //           const tripSteps: L.LatLng[] = [];
+  //           this.userService.reverseGeocode(trip.steps[0].latitude, trip.steps[0].longitude).pipe(first()).subscribe((address: any = {}) => {
+  //             if (this.addressData) {
+  //               this.tripDataDate.tracking.trips[index].address = address;
+  //             }
+  //           })
+  //           trip.steps.forEach((step: any) => {
+  //             const latitude = parseFloat(step.latitude);
+  //             const longitude = parseFloat(step.longitude);
+          
+  //             if (!isNaN(latitude) && !isNaN(longitude)) {
+  //               const coordinate = L.latLng(latitude, longitude);
+  //               tripSteps.push(coordinate);
+  //             }
+  //           }); 
+  //           if (tripSteps.length > 0) {
+  //             tripCoordinates.push(tripSteps);
+          
+  //             if (this.map) {
+  //               const stepMarker = L.circleMarker(tripSteps[0], {
+  //                 radius: 10, // Adjust the radius as needed
+  //                 color: 'red', // Adjust the color as needed
+  //                 fillColor: 'red', // Adjust the fill color as needed
+  //                 fillOpacity: 1, // Adjust the fill opacity as needed
+  //               }).addTo(this.map);
+
+  //               stepMarker.bindTooltip(`${stepNumber}`, {
+  //               permanent: true,
+  //               direction: 'center',
+  //               className: 'step-marker-tooltip', // Ajoutez une classe CSS personnalisée pour le style
+  //               opacity: 0.3
+  //               });
+
+
+  //               stepMarker.bindPopup(`Étape ${stepNumber}`);
+  //               stepNumber++;
+  //               const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
+  //             }
+  //           }
+  //         });
+  //         console.log('data du trip par jour = ', this.tripDataDate);
+  //         this.map?.setView(tripCoordinates[0][0], 12, { animate: true });
+  //       }
+  //     });
+  //   }
+  // }
+
   selectedDateTrip() {
+    this.isTripSelected = true;
     if (this.numberDate) {
       this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id, this.numberDate).subscribe((data: any) => {
         this.tripDataDate = data;
@@ -263,67 +422,54 @@ export class HomePage implements AfterViewInit {
           this.tripDataDate.tracking.trips.forEach((trip: any, index :any) => {
             const tripSteps: L.LatLng[] = [];
             this.userService.reverseGeocode(trip.steps[0].latitude, trip.steps[0].longitude).pipe(first()).subscribe((address: any = {}) => {
-              if (this.addressData) {
-                this.tripDataDate.tracking.trips[index].address = address;
-              }
-            })
-          
-            trip.steps.forEach((step: any) => {
-              const latitude = parseFloat(step.latitude);
-              const longitude = parseFloat(step.longitude);
-          
-              if (!isNaN(latitude) && !isNaN(longitude)) {
-                const coordinate = L.latLng(latitude, longitude);
-                tripSteps.push(coordinate);
-              }
-            });
-          
+                          if (this.addressData) {
+                            this.tripDataDate.tracking.trips[index].address = address;
+                          }
+                        })
+                        trip.steps.forEach((step: any) => {
+                          const latitude = parseFloat(step.latitude);
+                          const longitude = parseFloat(step.longitude);
+                      
+                          if (!isNaN(latitude) && !isNaN(longitude)) {
+                            const coordinate = L.latLng(latitude, longitude);
+                            tripSteps.push(coordinate);
+                          }
+                        }); 
+  
             if (tripSteps.length > 0) {
               tripCoordinates.push(tripSteps);
-          
+  
               if (this.map) {
                 const stepMarker = L.circleMarker(tripSteps[0], {
-                  radius: 10, // Adjust the radius as needed
-                  color: 'red', // Adjust the color as needed
-                  fillColor: 'red', // Adjust the fill color as needed
-                  fillOpacity: 1, // Adjust the fill opacity as needed
-                }).addTo(this.map);
-
-                stepMarker.bindTooltip(`${stepNumber}`, {
-                permanent: true,
-                direction: 'center',
-                className: 'step-marker-tooltip', // Ajoutez une classe CSS personnalisée pour le style
-                opacity: 0.3
-                });
-
-
-                stepMarker.bindPopup(`Étape ${stepNumber}`);
-                stepNumber++;
+                                  radius: 10, // Adjust the radius as needed
+                                  color: 'red', // Adjust the color as needed
+                                  fillColor: 'red', // Adjust the fill color as needed
+                                  fillOpacity: 1, // Adjust the fill opacity as needed
+                                }).addTo(this.map);
+                
+                                stepMarker.bindTooltip(`${stepNumber}`, {
+                                permanent: true,
+                                direction: 'center',
+                                className: 'step-marker-tooltip', // Ajoutez une classe CSS personnalisée pour le style
+                                opacity: 0.3
+                                });
+                
+                
+                                stepMarker.bindPopup(`Étape ${stepNumber}`);
+                                stepNumber++;
+  
+                const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
               }
             }
           });
-          console.log('data du trip par jour = ', this.tripDataDate);
-          if (this.map) {
-            const tripPolyline = L.polyline(tripCoordinates, { color: 'red' }).addTo(this.map);
   
-            const startMarker = L.circleMarker(tripCoordinates[0][0], {
-              radius: 10, // Ajustez le rayon selon vos besoins
-              color: 'green', // Ajustez la couleur selon vos besoins
-              fillColor: 'green', // Ajustez la couleur de remplissage selon vos besoins
-              fillOpacity: 1 // Ajustez l'opacité de remplissage selon vos besoins
-            }).addTo(this.map);
-            
-            startMarker.bindPopup('Départ');
-            
-            const endMarker = L.circleMarker(tripCoordinates[tripCoordinates.length - 1][tripCoordinates.length - 1], {
-              radius: 10, // Ajustez le rayon selon vos besoins
-              color: 'black', // Ajustez la couleur selon vos besoins
-              fillColor: 'black', // Ajustez la couleur de remplissage selon vos besoins
-              fillOpacity: 1 // Ajustez l'opacité de remplissage selon vos besoins
-            }).addTo(this.map);
-            
-            endMarker.bindPopup('Arrivée');
-          }
+          console.log('data du trip par jour = ', this.tripDataDate);
+  
+          // Create a bounds object using all the coordinates of the trip
+          const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
+  
+          // Adjust the view of the map to fit the bounds
+          this.map?.fitBounds(bounds);
         }
       });
     }
@@ -367,6 +513,7 @@ export class HomePage implements AfterViewInit {
         }
       });
     }
+    this.isTripSelected = false;
   }
 }
 
