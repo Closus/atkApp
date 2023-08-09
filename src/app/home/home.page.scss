@@ -109,10 +109,34 @@ span {
 
 .rotate-icon {
   transform-origin: center center !important;
-  margin-left: -40px;
-  margin-top: -80px;
+  margin-left: -50px!important;
+  margin-top: -100px!important;
+}
+
+.stopped-icon {
+  transform-origin: center center !important;
+  margin-left: -50px!important;
+  margin-top: -100px!important;
 }
 
 .no-transition {
   transition: none !important;
+}
+
+::ng-deep .custom-popup .leaflet-popup-content-wrapper{
+  background: black!important;
+  color: white!important;
+  opacity: 0.8!important;
+}
+
+::ng-deep .custom-popup .leaflet-popup-content-wrapper h1 {
+  text-align: center!important;
+}
+
+::ng-deep .custom-popup .leaflet-popup-tip {
+  background-color: black!important;
+}
+
+.th {
+  color: #EC851E;
 }

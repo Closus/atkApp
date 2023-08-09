@@ -45,15 +45,11 @@
     <span class="itinerary" (click)="launchNavigation()"><fa-icon icon="location-arrow"></fa-icon></span>
   </div>
   <ion-content>
-    <div id="mapId" class="map"></div>
+    <div id="mapId" class="custom-popup"></div>
     <ion-button *ngIf="isTripSelected" expand="full" class="menu-button" (click)="openTripListModal()" color="success">
       <ion-icon name="menu"></ion-icon>
     </ion-button>
-    <div class="custom-marker">
-      <div class="outer-circle"></div>
-      <div class="inner-circle"></div>
-      <div class="flashlight"></div>
-    </div>
     <app-trip-list-modal (labelSelected)="onLabelSelected($event)"></app-trip-list-modal>
   </ion-content>
 </div>
+

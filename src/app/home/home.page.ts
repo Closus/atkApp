@@ -39,7 +39,7 @@ export class HomePage implements AfterViewInit {
   customIcon = L.icon({
     iconUrl: '../../assets/images/logoMarker.png',
     iconSize: [80, 80],
-    iconAnchor: [10, 80],
+    iconAnchor: [40, 40],
     className: 'rotate-icon'
   });
   finishIcon = L.icon({
@@ -47,6 +47,7 @@ export class HomePage implements AfterViewInit {
     iconSize: [35, 35]
   });
   isTripSelected: boolean = false;
+  currentRotation: number = 0;
 
   constructor(private menu: MenuController, 
               public modalController: ModalController, 
@@ -118,34 +119,34 @@ export class HomePage implements AfterViewInit {
           this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
           L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
 
-          this.map.on('zoomstart', () => {
-            if (this.map) {
-              // Ajoutez la classe 'no-transition' à l'élément du marqueur
-              const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
-              const marker = L.marker(coordinates).addTo(this.map);
-              const markerElement = marker.getElement();
-              if (markerElement) {
-                markerElement.classList.add('no-transition');
-              }
-            }
-          });
-          this.map.on('zoomend', () => {
-            if (this.map) {
-              // Réinitialisez la rotation de l'icône du marqueur
-              const heading = this.selectedItem.value.positionData.position.heading;
-              const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
-              const marker = L.marker(coordinates).addTo(this.map);
-              const markerElement = marker.getElement();
-              if (markerElement) {
-                markerElement.style.transition = 'none';
-                markerElement.style.transform = `rotate(${heading}deg)`;
-                // Supprimez la classe 'no-transition' de l'élément du marqueur
-                markerElement.classList.remove('no-transition');
-              }
-              // Mettez à jour la carte
-              this.updateMap();
-            }
-        });     
+        //   this.map.on('zoomstart', () => {
+        //     if (this.map) {
+        //       // Ajoutez la classe 'no-transition' à l'élément du marqueur
+        //       const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
+        //       const marker = L.marker(coordinates).addTo(this.map);
+        //       const markerElement = marker.getElement();
+        //       if (markerElement) {
+        //         markerElement.classList.add('no-transition');
+        //       }
+        //     }
+        //   });
+        //   this.map.on('zoomend', () => {
+        //     if (this.map) {
+        //       // Réinitialisez la rotation de l'icône du marqueur
+        //       const heading = this.selectedItem.value.positionData.position.heading;
+        //       const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
+        //       const marker = L.marker(coordinates).addTo(this.map);
+        //       const markerElement = marker.getElement();
+        //       if (markerElement) {
+        //         markerElement.style.transition = 'none';
+        //         markerElement.style.transform = `rotate(${this.currentRotation}deg)`;
+        //         // Supprimez la classe 'no-transition' de l'élément du marqueur
+        //         markerElement.classList.remove('no-transition');
+        //       }
+        //       // Mettez à jour la carte
+        //       this.updateMap();
+        //     }
+        // });     
         } else {
           this.navController.navigateRoot('login');
         }
@@ -241,13 +242,14 @@ export class HomePage implements AfterViewInit {
       customIcon = L.icon({
         iconUrl: '../../assets/images/Logo Stop.png', // Remplacez par l'URL de votre autre marqueur
         iconSize: [100, 100],
-        iconAnchor: [10, 80],
+        iconAnchor: [50, 50],
+        className: 'stopped-icon'
       });
     } else {
       customIcon = L.icon({
         iconUrl: '../../assets/images/logoMarker.png',
-        iconSize: [80, 80],
-        iconAnchor: [10, 80],
+        iconSize: [100, 100],
+        iconAnchor: [50, 50],
         className: 'rotate-icon' // Ajoutez une classe pour la rotation
       });
     }
@@ -256,7 +258,38 @@ export class HomePage implements AfterViewInit {
   
       // Créez un nouveau marqueur avec les nouvelles coordonnées
       const marker = L.marker(coordinates, { icon: customIcon });
-      marker.bindPopup(`<p>${selected.trackerData.name}</p>`);
+      marker.bindPopup(`<div class="custom-popup" style="background: black;">
+                          <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
+                          <p style="text-align: center;">${selected.address.road ?? ''} ${selected.address.house_number ?? ''}, ${selected.address.postcode ?? ''} ${selected.address.town ?? ''}</p>
+                          <table>
+                            <tr>
+                              <th style="color: #EC851E;">Durée Trajet:</th>
+                              <th style="color: #EC851E;">Vitesse:</th>
+                            </tr>
+                            <tr>
+                              <td></td>
+                              <td>${selected.positionData.position.speed} km/h</td>
+                            </tr>
+                            <tr>
+                              <th style="color: #EC851E;">Distance Trajet:</td>
+                              <th style="color: #EC851E;">Batterie</td>
+                            </tr>
+                            <tr>
+                              <td>Ligne 3, Colonne 1</td>
+                              <td>Ligne 3, Colonne 2</td>
+                            </tr>
+                            <tr>
+                              <th style="color: #EC851E;">Altitude:</td>
+                              <th style="color: #EC851E;">Température</td>
+                            </tr>
+                            <tr>
+                              <td>${selected.positionData.position.altitude} m</td>
+                              <td>Ligne 3, Colonne 2</td>
+                            </tr>
+                          </table>
+                        </div>`
+                      );
+
       this.map?.addLayer(marker);
   
       // Faire pivoter le marqueur en fonction de l'attribut "heading"
@@ -265,6 +298,7 @@ export class HomePage implements AfterViewInit {
       if (markerElement) {
         markerElement.style.transformOrigin = 'center bottom';
         markerElement.style.transform += `rotate(${heading}deg)`;
+        this.currentRotation = heading;
       }
     }
   }
@@ -308,11 +342,6 @@ export class HomePage implements AfterViewInit {
         const heading = this.selectedItem.value.positionData.position.heading;
         const coordinates: L.LatLngTuple = [selectedPosition.latitude, selectedPosition.longitude];
         const marker = L.marker(coordinates, { icon: this.customIcon }).addTo(this.map);
-        const markerElement = marker.getElement();
-        if (markerElement) {
-          markerElement.style.transformOrigin = 'center bottom';
-          markerElement.style.transform += `rotate(${heading}deg)`;
-        }
       }
     }
   }
