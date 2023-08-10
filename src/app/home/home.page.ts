@@ -26,7 +26,7 @@ export class HomePage implements AfterViewInit {
   email: string | undefined;
   name: string | undefined;
   mobile: string | undefined;
-  selectedItem = new BehaviorSubject<any>(null);
+  selected = new BehaviorSubject<any>(null);
   pageTitle: string = 'Accueil';  
   selectedDate: string | undefined;
   numberDate: string | undefined;
@@ -58,7 +58,7 @@ export class HomePage implements AfterViewInit {
   ngOnInit() {
     this.menu.swipeGesture(false);
   // Vérifier si un élément est sélectionné
-  this.selectedItem.subscribe((selected: any) => {
+  this.userService.selected.subscribe((selected: any) => {
     console.log('SELECTED', selected);
     if (selected) {
       this.pageTitle = selected.trackerData.name;
@@ -122,7 +122,7 @@ export class HomePage implements AfterViewInit {
         //   this.map.on('zoomstart', () => {
         //     if (this.map) {
         //       // Ajoutez la classe 'no-transition' à l'élément du marqueur
-        //       const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
+        //       const coordinates: L.LatLngTuple = [this.userService.selected.value.positionData.position.latitude, this.userService.selected.value.positionData.position.longitude];
         //       const marker = L.marker(coordinates).addTo(this.map);
         //       const markerElement = marker.getElement();
         //       if (markerElement) {
@@ -133,8 +133,8 @@ export class HomePage implements AfterViewInit {
         //   this.map.on('zoomend', () => {
         //     if (this.map) {
         //       // Réinitialisez la rotation de l'icône du marqueur
-        //       const heading = this.selectedItem.value.positionData.position.heading;
-        //       const coordinates: L.LatLngTuple = [this.selectedItem.value.positionData.position.latitude, this.selectedItem.value.positionData.position.longitude];
+        //       const heading = this.userService.selected.value.positionData.position.heading;
+        //       const coordinates: L.LatLngTuple = [this.userService.selected.value.positionData.position.latitude, this.userService.selected.value.positionData.position.longitude];
         //       const marker = L.marker(coordinates).addTo(this.map);
         //       const markerElement = marker.getElement();
         //       if (markerElement) {
@@ -171,7 +171,7 @@ export class HomePage implements AfterViewInit {
   }
 
   // updateSelectedMarker(): void {
-  //   const selected = this.selectedItem.getValue();
+  //   const selected = this.userService.selected.getValue();
   
   //   if (selected && selected.positionData.position) {
   //     const customIcon = L.icon({
@@ -212,7 +212,7 @@ export class HomePage implements AfterViewInit {
 
   updateMap(): void {
     // Vérifiez si un élément est sélectionné
-    this.selectedItem.subscribe((selected: any) => {
+    this.userService.selected.subscribe((selected: any) => {
       if (selected) {
         // Mettre à jour le titre de la page
         this.pageTitle = selected.trackerData.name;
@@ -272,19 +272,19 @@ export class HomePage implements AfterViewInit {
                             </tr>
                             <tr>
                               <th style="color: #EC851E;">Distance Trajet:</td>
-                              <th style="color: #EC851E;">Batterie</td>
+                              <th style="color: #EC851E;">Batterie:</td>
                             </tr>
                             <tr>
-                              <td>Ligne 3, Colonne 1</td>
-                              <td>Ligne 3, Colonne 2</td>
+                              <td> km</td>
+                              <td> V</td>
                             </tr>
                             <tr>
                               <th style="color: #EC851E;">Altitude:</td>
-                              <th style="color: #EC851E;">Température</td>
+                              <th style="color: #EC851E;">Température:</td>
                             </tr>
                             <tr>
                               <td>${selected.positionData.position.altitude} m</td>
-                              <td>Ligne 3, Colonne 2</td>
+                              <td> °C</td>
                             </tr>
                           </table>
                         </div>`
@@ -310,7 +310,7 @@ export class HomePage implements AfterViewInit {
     });
     this.clearMap();
     modal.onDidDismiss().then((data) => {
-      this.selectedItem.next(data.data);
+      this.userService.selected.next(data.data);
       this.selectedTracker = data.data;
   
       // Ajouter la condition pour vérifier si la date sélectionnée est antérieure à la date actuelle
@@ -326,8 +326,8 @@ export class HomePage implements AfterViewInit {
   }
 
   centerMap(): void {
-    if (this.selectedItem.value && this.selectedItem.value.positionData.position) {
-      const selectedPosition = this.selectedItem.value.positionData.position;
+    if (this.userService.selected.value && this.userService.selected.value.positionData.position) {
+      const selectedPosition = this.userService.selected.value.positionData.position;
       this.map?.setView([selectedPosition.latitude, selectedPosition.longitude], 17, { animate: true });
       
       if (this.map) {
@@ -339,7 +339,7 @@ export class HomePage implements AfterViewInit {
         });
 
         // Ajoutez le marqueur avec la bonne position de heading
-        const heading = this.selectedItem.value.positionData.position.heading;
+        const heading = this.userService.selected.value.positionData.position.heading;
         const coordinates: L.LatLngTuple = [selectedPosition.latitude, selectedPosition.longitude];
         const marker = L.marker(coordinates, { icon: this.customIcon }).addTo(this.map);
       }
@@ -347,7 +347,7 @@ export class HomePage implements AfterViewInit {
   }
 
   launchNavigation(): void {
-    const selectedPosition = this.selectedItem.value.positionData.position;
+    const selectedPosition = this.userService.selected.value.positionData.position;
     const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedPosition.latitude},${selectedPosition.longitude}`;
     window.open(url, '_blank');
   }  
@@ -387,7 +387,7 @@ export class HomePage implements AfterViewInit {
   }
 
   selectedTrip() {
-    this.userService.getTripById('gettrip', this.selectedItem.value.trackerData.id).subscribe((data: any) => {
+    this.userService.getTripById('gettrip', this.userService.selected.value.trackerData.id).subscribe((data: any) => {
       console.log('data du trip = ', data);
       this.tripData = data;
     });
@@ -395,7 +395,7 @@ export class HomePage implements AfterViewInit {
 
   // selectedDateTrip() {
   //   if (this.numberDate) {
-  //     this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id, this.numberDate).subscribe((data: any) => {
+  //     this.userService.getTripByDate('gettrip', this.userService.selected.value.trackerData.id, this.numberDate).subscribe((data: any) => {
   //       this.tripDataDate = data;
   
   //       if (this.tripDataDate && this.tripDataDate.tracking && this.tripDataDate.tracking.trips && this.tripDataDate.tracking.trips.length > 0) {
@@ -453,7 +453,7 @@ export class HomePage implements AfterViewInit {
   selectedDateTrip() {
     this.isTripSelected = true;
     if (this.numberDate) {
-      this.userService.getTripByDate('gettrip', this.selectedItem.value.trackerData.id, this.numberDate).subscribe((data: any) => {
+      this.userService.getTripByDate('gettrip', this.userService.selected.value.trackerData.id, this.numberDate).subscribe((data: any) => {
         this.tripDataDate = data;
   
         if (this.tripDataDate && this.tripDataDate.tracking && this.tripDataDate.tracking.trips && this.tripDataDate.tracking.trips.length > 0) {

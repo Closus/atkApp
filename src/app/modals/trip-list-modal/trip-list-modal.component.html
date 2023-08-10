@@ -8,12 +8,33 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 <ion-content style="--background: black;">
+  <div class="infos" *ngIf="trips">
+    <span class="name"></span>
+    <span class="adresse">{{trips[trips.length-1].address.features[0].properties.address.road}}</span>
+    <table>
+      <tr>
+        <th class="left-table">Durée totale:</th>
+        <th class="right-table"></th>
+      </tr>
+      <tr>
+        <th class="left-table">Distance totale:</th>
+        <th class="right-table"></th>
+      </tr>
+      <tr>
+        <th class="left-table">Vitesse moyenne:</th>
+        <th class="right-table"></th>
+      </tr>
+      <tr>
+        <th class="left-table">Vitesse maximale:</th>
+        <th class="right-table"></th>
+      </tr>
+    </table>
+  </div>
   <ion-list style="background: black;">
-    <ion-item *ngFor="let trip of trips" (click)="centerMapOnLabel(trip)" style="--background: black;border-bottom: solid 1px #EC851E;">
+    <ion-item *ngFor="let trip of trips" (click)="centerMapOnLabel(trip)" style="--background: black;">
       <ion-label style="color: white;">
-      {{ trip.address.features[0].properties.display_name }}
+        ok
       </ion-label>
     </ion-item>
   </ion-list>

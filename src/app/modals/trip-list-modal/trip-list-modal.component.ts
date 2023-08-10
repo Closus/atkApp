@@ -2,7 +2,8 @@ import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core
 import { ModalController } from '@ionic/angular';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { HomePage } from 'src/app/home/home.page';
+import { UserService } from '../../api/user.service';
+import { BehaviorSubject } from 'rxjs';
 
 
 @Component({
@@ -17,9 +18,16 @@ export class TripListModalComponent {
   @Input() trips: any[] | undefined; 
   @Output() labelSelected = new EventEmitter<string>();
   data: any;
+  selected : any;
 
-  constructor(private modalController: ModalController) {}
+  constructor(private modalController: ModalController, private userService: UserService) {
+    this.userService.selected.subscribe((response: any) => {
+      this.data = response;
+      console.log('selected', this.data);
+    });
+  }
 
+  
   closeModal() {
     this.modalController.dismiss();
   }

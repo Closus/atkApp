@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,8 @@ export class UserService {
   public tracking: any;
   public listtrackers: any[] = [];
   combinedData: any[] = [];
+  public selected = new BehaviorSubject<any>(null);
+
   constructor(private http: HttpClient) { }
 
   login(email: string, password: string) {
