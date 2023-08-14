@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar style="--background: #EC851E;" class="toolbar">
     <ion-title class="title">Balises</ion-title>
-    <ion-select [(ngModel)]="selectedType" (ionChange)="handleEvent($event)" style="--background: #EC851E; color: white;">
+    <ion-select [(ngModel)]="selectedType" (ionChange)="handleEvent($event)" interface="action-sheet" style="--background: #EC851E; color: white;">
       <ion-select-option value="vehicule">Véhicules</ion-select-option>
       <ion-select-option value="Batiments">Bâtiments</ion-select-option>
       <ion-select-option value="Autres">Autres</ion-select-option>
