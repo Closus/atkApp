@@ -52,26 +52,27 @@ export class HomePage implements AfterViewInit {
   trips: any;
 
   constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, public tripListModal: TripListModalComponent) {
-    this.userDetails = this.userService.userDetails.pipe(first()).subscribe((userDetails: any) => {
-      console.log(this.userDetails);
+    this.userDetails = this.userService.userDetails.pipe(first()).subscribe((response: any) => {
+      this.userDetails = response;
+      console.log('userDetails', this.userDetails)
     })
   }
 
   ngOnInit() {
     this.userService.trackers.subscribe((trackers: any) => {
-      console.log(trackers);
+      console.log('trackers', trackers);
     })
     this.menu.swipeGesture(false);
-  // Vérifier si un élément est sélectionné
-  this.userService.selected.subscribe((selected: any) => {
-    console.log('SELECTED', selected);
-    if (selected) {
-      this.pageTitle = selected.trackerData.name;
-      this.centerMap();
-      this.updateSelectedMarker(selected);
-    } else {
-      this.pageTitle = 'Accueil';
-    }
+    // Vérifier si un élément est sélectionné
+    this.userService.selected.subscribe((selected: any) => {
+      console.log('SELECTED', selected);
+      if (selected) {
+        this.pageTitle = selected.trackerData.name;
+        this.centerMap();
+        this.updateSelectedMarker(selected);
+      } else {
+        this.pageTitle = 'Accueil';
+      }
     });
   }
 

@@ -37,7 +37,6 @@ export class LoginPage implements OnInit {
     if (!this.userService.isLogged) {
       this.email = localStorage.getItem('savedEmail');
       this.password = localStorage.getItem('savedPassword');
-      console.log(this.email, this.password);
       if (this.email && this.password) {
         this.login();
       }
