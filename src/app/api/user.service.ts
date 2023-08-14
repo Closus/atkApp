@@ -63,6 +63,12 @@ export class UserService {
                       trackers.trackers[tIndex].address = address.features[0].properties.address;
                     }
                   })
+                } else if (tracker.info && tracker.info.position && tracker.info.position.latitude && tracker.info.position.longitude) {
+                  this.http.get('http://94.23.210.102/nominatim/reverse?format=geojson&lat=' + tracker.info.position.latitude + '&lon=' + tracker.info.position.longitude ).subscribe((address : any) => {  
+                      if (address.features && address.features[0] && address.features[0].properties) {
+                          trackers.trackers[tIndex].address = address.features[0].properties.address;
+                      }
+                  }) 
                 }
                 else {
                   trackers.trackers[tIndex].address = null;

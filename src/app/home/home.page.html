@@ -4,12 +4,12 @@
         <ion-item style="background: black;">
           <div class="user">
             <div class="icon" style="font-size: 10em;"><ion-icon name="person-circle-outline"></ion-icon></div>
-            <div class="label" style="font-size: xx-large;"><ion-label><div>{{name}}</div></ion-label></div>
+            <div class="label" style="font-size: xx-large;"><ion-label><div>{{userDetails?.user?.name}}</div></ion-label></div>
           </div>
         </ion-item>
       <div class="infos" style="color:white;">
-        <div><ion-icon name="mail-outline"></ion-icon>{{email}}</div>
-        <div><ion-icon name="call-outline"></ion-icon>{{mobile}}</div>
+        <div><ion-icon name="mail-outline"></ion-icon>{{userDetails?.user?.email}}</div>
+        <div><ion-icon name="call-outline"></ion-icon>{{userDetails?.user?.mobile}}</div>
       </div> 
       <div class="disconnect">
         <ion-icon name="exit-outline" style="font-size: xx-large; color: red;"></ion-icon>
@@ -45,7 +45,7 @@
     <span class="itinerary" (click)="launchNavigation()"><fa-icon icon="location-arrow"></fa-icon></span>
   </div>
   <ion-content>
-    <div id="mapId" class="custom-popup"></div>
+    <div id="mapId" class="mapId"></div>
     <ion-button *ngIf="isTripSelected" expand="full" class="menu-button" (click)="openTripListModal()" color="success">
       <ion-icon name="menu"></ion-icon>
     </ion-button>

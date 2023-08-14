@@ -1,6 +1,11 @@
 <ion-header>
-  <ion-toolbar style="--background: #EC851E;">
-    <ion-title style="color: white;">Balises</ion-title>
+  <ion-toolbar style="--background: #EC851E;" class="toolbar">
+    <ion-title class="title">Balises</ion-title>
+    <ion-select [(ngModel)]="selectedType" (ionChange)="handleEvent($event)" style="--background: #EC851E; color: white;">
+      <ion-select-option value="vehicule">Véhicules</ion-select-option>
+      <ion-select-option value="Batiments">Bâtiments</ion-select-option>
+      <ion-select-option value="Autres">Autres</ion-select-option>
+    </ion-select> 
     <ion-buttons slot="end">
       <ion-button (click)="closeModal()" style="color: white;">Close</ion-button>
     </ion-buttons>
@@ -8,15 +13,14 @@
 </ion-header>
 <ion-content style="--background: black;">
   <ion-list style="background: black;">
-    <ng-container *ngFor="let data of userService.combinedData">
-      <ion-item *ngIf="data.positionData.position"  (click)="selectItem(data)" style="--background: black;border-bottom: solid 1px #EC851E;">
+    <ng-container *ngFor="let tracker of getFilteredTrackers()">
+      <ion-item (click)="selectItem(tracker)" style="--background: black;border-bottom: solid 1px #EC851E;">
         <ion-avatar slot="start">
-          <ion-img [src]="data.trackerData.pictureUrl"></ion-img>
+          <ion-img [src]="tracker.pictureUrl" *ngIf="tracker.pictureUrl"></ion-img>
         </ion-avatar>
         <ion-label style="color: white;">
-          <h2>{{ data.trackerData.name}}</h2>
-          <p>{{ data.positionData.position.speed }} km/h</p>
-          <!-- <p>{{ reverseGeocodedAddresses[data.imei] || 'Loading...' }}</p> -->
+          <h2>{{tracker.name}}</h2>
+          <p>{{ tracker.address ? ((tracker.address.road ?? '') + ' ' + (tracker.address.house_number ?? '') + ', ' + (tracker.address.postcode ?? '') + ' ' + (tracker.address.town ?? '') + ', ' + (tracker.address.country ?? '')) : '' }}</p>
         </ion-label>
       </ion-item>
     </ng-container>

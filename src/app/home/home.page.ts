@@ -22,6 +22,7 @@ import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } f
 export class HomePage implements AfterViewInit {
   @ViewChild(BaliseComponent) baliseComponent!: BaliseComponent; // Access the BaliseComponent instance
   userDetails : any;
+  trackerDetails : any;
   map: L.Map | undefined;
   email: string | undefined;
   name: string | undefined;
@@ -51,15 +52,15 @@ export class HomePage implements AfterViewInit {
   stepNumber: number = 1;
   trips: any;
 
-  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, public tripListModal: TripListModalComponent) {
-    this.userDetails = this.userService.userDetails.pipe(first()).subscribe((response: any) => {
-      this.userDetails = response;
-      console.log('userDetails', this.userDetails)
-    })
-  }
+  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, public tripListModal: TripListModalComponent) {}
 
   ngOnInit() {
+    this.userService.userDetails.pipe(first()).subscribe((users: any) => {
+      this.userDetails = users;
+      console.log('userDetails', users)
+    })
     this.userService.trackers.subscribe((trackers: any) => {
+      this.trackerDetails = trackers;
       console.log('trackers', trackers);
     })
     this.menu.swipeGesture(false);
@@ -76,12 +77,10 @@ export class HomePage implements AfterViewInit {
     });
   }
 
-  ngAfterViewInit(): void {
+  ngAfterViewInit() {
     if (this.userDetails) {
       this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
-    } else {
-      this.navController.navigateRoot('/login');
     }
   }
   
