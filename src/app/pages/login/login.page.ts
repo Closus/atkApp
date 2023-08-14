@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { NavController } from '@ionic/angular';
 import { UserService } from 'src/app/api/user.service';
-import { catchError, first } from 'rxjs';
+import { NavController } from '@ionic/angular';
 
 
 @Component({
@@ -16,46 +15,32 @@ import { catchError, first } from 'rxjs';
 })
 export class LoginPage implements OnInit {
 
-  constructor(private navController: NavController, private userService: UserService) {
-    this.email = '';
-    this.password = '';
-   }
+  constructor(private userService: UserService, private navController: NavController) {}
 
-  email!: string;
-  password!: string;
+  email!: any;
+  password!: any;
   loginError: boolean = false;
 
   login() {
-    this.userService.login(this.email, this.password).pipe(first()).subscribe((response: any) => {
-      console.log(response);
-      if (response.status === 501) {
-        console.log('response', response);
-        const uuid = response.user.uuid;
-        console.log("----------");
-        console.log(uuid);
-        console.log(this.userService)
-        this.userService.userDetails = response.user;
-          localStorage.setItem('savedEmail', this.email);
-          localStorage.setItem('savedPassword', this.password);
-          this.navController.navigateRoot('home');
-      } else {
-        this.loginError = true;
-      }
+    this.userService.login(this.email, this.password).then((success) => {
+      localStorage.setItem('savedEmail', this.email);
+      localStorage.setItem('savedPassword', this.password);
+      this.navController.navigateRoot('home');  
+    }
+    ).catch((error) => {
+      console.log('Erreur Login');
+      this.loginError = true;
     });
   }
 
   ngOnInit() {
-    const savedEmail = localStorage.getItem('savedEmail');
-    const savedPassword = localStorage.getItem('savedPassword');
-
-    if (savedEmail && savedPassword) {
-      this.email = savedEmail;
-      this.password = savedPassword;
-      this.login();
+    if (!this.userService.isLogged) {
+      this.email = localStorage.getItem('savedEmail');
+      this.password = localStorage.getItem('savedPassword');
+      console.log(this.email, this.password);
+      if (this.email && this.password) {
+        this.login();
+      }
     }
-  }
-
-  goToHomePage() {
-    this.login();
   }
 }

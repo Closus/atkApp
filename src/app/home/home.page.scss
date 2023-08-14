@@ -107,6 +107,12 @@ span {
   padding: 5px;
 }
 
+::ng-deep .leaflet-tooltip {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
 .rotate-icon {
   transform-origin: center center !important;
   margin-left: -50px!important;

@@ -10,31 +10,33 @@
 </ion-header>
 <ion-content style="--background: black;">
   <div class="infos" *ngIf="trips">
-    <span class="name"></span>
-    <span class="adresse">{{trips[trips.length-1].address.features[0].properties.address.road}}</span>
-    <table>
+    <div class="user">
+      <span class="name">{{ data.trackerData.name }}</span>
+      <span class="adresse">{{ data.address.road ?? '' }} {{ data.address.house_number ?? '' }}, {{ data.address.postcode ?? '' }} {{ data.address.town ?? '' }}</span>
+    </div>
+    <!-- <table>
       <tr>
-        <th class="left-table">Durée totale:</th>
-        <th class="right-table"></th>
+        <td class="left-table">Durée totale:</td>
+        <td class="right-table">Test</td>
       </tr>
       <tr>
-        <th class="left-table">Distance totale:</th>
-        <th class="right-table"></th>
+        <td class="left-table">Distance totale:</td>
+        <td class="right-table"></td>
       </tr>
       <tr>
-        <th class="left-table">Vitesse moyenne:</th>
-        <th class="right-table"></th>
+        <td class="left-table">Vitesse moyenne:</td>
+        <td class="right-table"></td>
       </tr>
       <tr>
-        <th class="left-table">Vitesse maximale:</th>
-        <th class="right-table"></th>
+        <td class="left-table">Vitesse maximale:</td>
+        <td class="right-table">{{ data.positionData.maxspeed }}</td>
       </tr>
-    </table>
+    </table> -->
   </div>
   <ion-list style="background: black;">
-    <ion-item *ngFor="let trip of trips" (click)="centerMapOnLabel(trip)" style="--background: black;">
-      <ion-label style="color: white;">
-        ok
+    <ion-item *ngFor="let trip of trips; index as tripIndex" (click)="centerMapOnLabel(trip)" style="--background: black;">
+      <ion-label style="color: #EC851E;">
+        {{ tripIndex+1 }}
       </ion-label>
     </ion-item>
   </ion-list>

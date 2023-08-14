@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
+import { NavController } from '@ionic/angular';
+import { rejects } from 'assert';
 
 @Injectable({
   providedIn: 'root'
@@ -14,33 +16,85 @@ export class UserService {
       'Content-Type':  'application/x-www-form-urlencoded'
     })
   }
-  public userDetails: any;
+  public isLogged : boolean = false;
+  public userDetails = new BehaviorSubject<any>(null);
+  public trackers = new BehaviorSubject<any>(null);
   public positions: any;
   public tracking: any;
   public listtrackers: any[] = [];
   combinedData: any[] = [];
   public selected = new BehaviorSubject<any>(null);
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private navController: NavController) { }
 
   login(email: string, password: string) {
-    const body = new URLSearchParams();
-    body.set('token' , '7254941903');
-    body.set('email', email);
-    body.set('passwd', password);
-    return this.http.post(this.apiUrl + '?authuser', body.toString(), this.httpOptions);
+    return new Promise((resolve, reject) => {
+      const body = new URLSearchParams();
+      body.set('token' , '7254941903');
+      body.set('email', email);
+      body.set('passwd', password);
+      this.http.post(this.apiUrl + '?authuser', body.toString(), this.httpOptions).subscribe((response : any) => {
+        if (response.status === 501) {
+          this.userDetails.next(response);
+          this.getTrackers(response.user.uuid);
+          this.isLogged = true;
+          resolve(true);
+        } else {
+          reject(false);
+        }
+      }, (error) => {
+        reject(false);
+      })
+    })
   }
 
-  getAPI(param : string) {
-    return this.http.get(this.apiUrl + '?' + param +'&token=7254941903' + '&uuid=' + this.userDetails.uuid);
+  getTrackers(userId : string) {
+    return new Promise((resolve, reject) => {
+      this.http.get(this.apiUrl + '?listtrackers' + '&token=7254941903' + '&uuid=' + userId).subscribe((trackers : any) => {
+        if (trackers.status === 501) {
+          this.http.get(this.apiUrl + '?getpositions' + '&token=7254941903' + '&uuid=' + userId).subscribe((positions : any) => {
+            if (positions.status === 501) {
+              trackers.trackers.forEach((tracker: any, tIndex: number) => {
+                let trackerInfo = positions.trackinglist.find((position: any) => position.imei === tracker.imei);
+                trackers.trackers[tIndex].info = trackerInfo;
+                if (tracker.latitude && tracker.longitude) {
+                  this.http.get('http://94.23.210.102/nominatim/reverse?format=geojson&lat=' + tracker.latitude + '&lon=' + tracker.longitude ).subscribe((address : any) => {  
+                    if (address.features) {
+                      trackers.trackers[tIndex].address = address.features[0].properties.address;
+                    }
+                  })
+                }
+                else {
+                  trackers.trackers[tIndex].address = null;
+                }
+              })
+              this.trackers.next(trackers);
+              resolve(true);
+            }
+            else {
+              reject(false);
+            }
+          });
+        }
+        else {
+          reject(false);
+        }
+      }), (error : any) => {
+        reject(false)
+      }
+    })
   }
 
-  getTripById(param : string, id: number) {
-    return this.http.get(this.apiUrl + '?' + param + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + id);
+  getAPI(param : string, userId : string) {
+    return this.http.get(this.apiUrl + '?' + param +'&token=7254941903' + '&uuid=' + userId);
   }
 
-  getTripByDate(param : string, id: number, date: string) {
-    return this.http.get(this.apiUrl + '?' + param + '&token=7254941903' + '&uuid=' + this.userDetails.uuid + "&trackerid=" + id + "&trackerdate=" + date);
+  getTripById(param : string, trackerId: number, userId: string) {
+    return this.http.get(this.apiUrl + '?' + param + '&token=7254941903' + '&uuid=' + userId + "&trackerid=" + trackerId);
+  }
+
+  getTripByDate(param : string, trackerId: number, date: string, userId : string) {
+    return this.http.get(this.apiUrl + '?' + param + '&token=7254941903' + '&uuid=' + userId + "&trackerid=" + trackerId + "&trackerdate=" + date);
   }
 
   reverseGeocode(latitude: any, longitude: any){

@@ -3,7 +3,6 @@ import { ModalController } from '@ionic/angular';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { UserService } from '../../api/user.service';
-import { BehaviorSubject } from 'rxjs';
 
 
 @Component({
