@@ -6,9 +6,8 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { TripListModalComponent } from '../modals/trip-list-modal/trip-list-modal.component';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
-import { forkJoin, BehaviorSubject, Subscription, first } from 'rxjs';
+import { BehaviorSubject, first } from 'rxjs';
 import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } from 'ion2-calendar';
-
 
 @Component({
     selector: 'app-home',
@@ -20,14 +19,13 @@ import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } f
 })
 
 export class HomePage implements AfterViewInit {
-  @ViewChild(BaliseComponent) baliseComponent!: BaliseComponent; // Access the BaliseComponent instance
   userDetails : any;
   trackerDetails : any;
   map: L.Map | undefined;
   email: string | undefined;
   name: string | undefined;
   mobile: string | undefined;
-  selected = new BehaviorSubject<any>(null);
+  selected : any;
   pageTitle: string = 'Accueil';  
   selectedDate: string | undefined;
   numberDate: string | undefined;
@@ -37,22 +35,23 @@ export class HomePage implements AfterViewInit {
   tripDataDate : any;
   addressData: any = {};
   previousCoordinates: L.LatLng | null = null;
-  customIcon = L.icon({
-    iconUrl: '../../assets/images/logoMarker.png',
-    iconSize: [80, 80],
-    iconAnchor: [40, 40],
-    className: 'rotate-icon'
-  });
-  finishIcon = L.icon({
-    iconUrl: '../../assets/images/finish.png',
-    iconSize: [35, 35]
-  });
+  Icon : any;
   isTripSelected: boolean = false;
   currentRotation: number = 0;
   stepNumber: number = 1;
   trips: any;
 
-  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, public tripListModal: TripListModalComponent) {}
+  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, public tripListModal: TripListModalComponent, private baliseComponent: BaliseComponent ) {
+    this.userService.trackerType.subscribe((trackerType: any) => {
+      console.log(trackerType);
+      this.Icon = L.icon({
+        iconUrl: '../../assets/images/'+trackerType+'.png',
+        iconSize: [100, 100],
+        iconAnchor: [50, 50],
+        className: 'rotate-icon' // Ajoutez une classe pour la rotation
+      });
+    })
+  }
 
   ngOnInit() {
     this.userService.userDetails.pipe(first()).subscribe((users: any) => {
@@ -66,11 +65,11 @@ export class HomePage implements AfterViewInit {
     this.menu.swipeGesture(false);
     // Vérifier si un élément est sélectionné
     this.userService.selected.subscribe((selected: any) => {
+      this.selected = selected;
       console.log('SELECTED', selected);
       if (selected) {
-        this.pageTitle = selected.trackerData.name;
+        this.pageTitle = selected.name;
         this.centerMap();
-        this.updateSelectedMarker(selected);
       } else {
         this.pageTitle = 'Accueil';
       }
@@ -168,7 +167,6 @@ export class HomePage implements AfterViewInit {
   //   }  
   // }
 
-
   openSideMenu() {
     this.menu.enable(true, 'myMenu');
     this.menu.open('myMenu');
@@ -232,7 +230,7 @@ export class HomePage implements AfterViewInit {
         this.pageTitle = selected.trackerData.name;
   
         // Mettre à jour le marqueur
-        this.updateSelectedMarker(selected);
+        //this.updateSelectedMarker(selected);
   
       } else {
         this.pageTitle = 'Accueil';
@@ -240,76 +238,111 @@ export class HomePage implements AfterViewInit {
     });
   }
   
-  updateSelectedMarker(selected: any): void {
-    // Supprimer tous les marqueurs existants de la carte
-    this.map?.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        this.map?.removeLayer(layer);
+  // updateSelectedMarker(selected: any): void {
+  //   // Supprimer tous les marqueurs existants de la carte
+  //   this.map?.eachLayer((layer) => {
+  //     if (layer instanceof L.Marker) {
+  //       this.map?.removeLayer(layer);
+  //     }
+  //   });
+
+  //   console.log('selected updateSelectedMarkers', selected);
+  
+  //   if (selected && selected.info.position) {
+  //     let customIcon;
+
+  //     if (selected.info.position.heading === '0.0') {
+  //     // Utilisez un autre marqueur si le heading est égal à 0.0
+  //     customIcon = L.icon({
+  //       iconUrl: '../../assets/images/Logo Stop.png', // Remplacez par l'URL de votre autre marqueur
+  //       iconSize: [100, 100],
+  //       iconAnchor: [50, 50],
+  //       className: 'stopped-icon'
+  //     });
+  //   } else {
+  //     customIcon = L.icon({
+  //       iconUrl: '../../assets/images/logoMarker.png',
+  //       iconSize: [100, 100],
+  //       iconAnchor: [50, 50],
+  //       className: 'rotate-icon' // Ajoutez une classe pour la rotation
+  //     });
+  //   }
+  
+  //     const coordinates = L.latLng(selected.info.position.latitude, selected.info.position.longitude);
+  
+  //     // Créez un nouveau marqueur avec les nouvelles coordonnées
+  //     const marker = L.marker(coordinates, { icon: customIcon });
+  //     marker.bindPopup(`<div class="custom-popup" style="background: black;">
+  //                         <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
+  //                         <p style="text-align: center;">${selected.address.road ?? ''} ${selected.address.house_number ?? ''}, ${selected.address.postcode ?? ''} ${selected.address.town ?? ''}</p>
+  //                         <table style="width: 100%;">
+  //                           <tr>
+  //                             <th style="color: #EC851E;">Durée Trajet:</th>
+  //                             <th style="color: #EC851E;">Vitesse:</th>
+  //                           </tr>
+  //                           <tr>
+  //                             <td></td>
+  //                             <td>${selected.info.position.speed} km/h</td>
+  //                           </tr>
+  //                           <tr>
+  //                             <th style="color: #EC851E;">Distance Trajet:</td>
+  //                             <th style="color: #EC851E;">Altitude:</td>
+  //                           </tr>
+  //                           <tr>
+  //                             <td> km</td>
+  //                             <td>${selected.info.position.altitude} m</td>
+  //                           </tr>
+  //                         </table>
+  //                       </div>`
+  //                     );
+
+  //     this.map?.addLayer(marker);
+  
+  //     // Faire pivoter le marqueur en fonction de l'attribut "heading"
+  //     const heading = selected.info.position.heading;
+  //     const markerElement = marker.getElement();
+  //     if (markerElement) {
+  //       markerElement.style.transformOrigin = 'center bottom';
+  //       markerElement.style.transform += `rotate(${heading}deg)`;
+  //       this.currentRotation = heading;
+  //     }
+  //   }
+  // }
+
+
+  updateSelectedMarker(latitude : any, longitude : any, speed?: any): void {
+    this.clearMap();
+    console.log('LAAAAAAAA', latitude);
+
+    latitude = parseFloat(latitude);
+    longitude = parseFloat(longitude);
+
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      const coordinates = L.latLng(latitude, longitude);
+
+      // Set the view to the selected coordinates
+      this.map?.setView(coordinates, 15, { animate: true });
+
+      // Create a marker for the selected coordinates
+      const marker = L.marker(coordinates);
+
+      // Check if the vehicle speed is 0.0
+      if (speed && speed === '0.0') {
+        console.log('iciiiiiiii', speed);
+        marker.setIcon(this.Icon);
+      } else {
+        // !!!!!!!! CHANGER LE TYPE OU VOIR LES DIFFERENCES DE DATA DES TRACKERS POUR IDENTIFIER LES 3
+        // Set the appropriate icon based on the selected type
+        marker.setIcon(this.Icon);
       }
-    });
-  
-    if (selected && selected.positionData.position) {
-      let customIcon;
 
-      if (selected.positionData.position.heading === '0.0') {
-      // Utilisez un autre marqueur si le heading est égal à 0.0
-      customIcon = L.icon({
-        iconUrl: '../../assets/images/Logo Stop.png', // Remplacez par l'URL de votre autre marqueur
-        iconSize: [100, 100],
-        iconAnchor: [50, 50],
-        className: 'stopped-icon'
-      });
-    } else {
-      customIcon = L.icon({
-        iconUrl: '../../assets/images/logoMarker.png',
-        iconSize: [100, 100],
-        iconAnchor: [50, 50],
-        className: 'rotate-icon' // Ajoutez une classe pour la rotation
-      });
-    }
-  
-      const coordinates = L.latLng(selected.positionData.position.latitude, selected.positionData.position.longitude);
-  
-      // Créez un nouveau marqueur avec les nouvelles coordonnées
-      const marker = L.marker(coordinates, { icon: customIcon });
-      marker.bindPopup(`<div class="custom-popup" style="background: black;">
-                          <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
-                          <p style="text-align: center;">${selected.address.road ?? ''} ${selected.address.house_number ?? ''}, ${selected.address.postcode ?? ''} ${selected.address.town ?? ''}</p>
-                          <table style="width: 100%;">
-                            <tr>
-                              <th style="color: #EC851E;">Durée Trajet:</th>
-                              <th style="color: #EC851E;">Vitesse:</th>
-                            </tr>
-                            <tr>
-                              <td></td>
-                              <td>${selected.positionData.position.speed} km/h</td>
-                            </tr>
-                            <tr>
-                              <th style="color: #EC851E;">Distance Trajet:</td>
-                              <th style="color: #EC851E;">Altitude:</td>
-                            </tr>
-                            <tr>
-                              <td> km</td>
-                              <td>${selected.positionData.position.altitude} m</td>
-                            </tr>
-                          </table>
-                        </div>`
-                      );
-
-      this.map?.addLayer(marker);
-  
-      // Faire pivoter le marqueur en fonction de l'attribut "heading"
-      const heading = selected.positionData.position.heading;
-      const markerElement = marker.getElement();
-      if (markerElement) {
-        markerElement.style.transformOrigin = 'center bottom';
-        markerElement.style.transform += `rotate(${heading}deg)`;
-        this.currentRotation = heading;
+      // Add the marker to the map
+      if (this.map) {
+        marker.addTo(this.map);
       }
     }
   }
-  
-  
+
   async presentModal() {
     const modal = await this.modalController.create({
       component: BaliseComponent
@@ -332,9 +365,15 @@ export class HomePage implements AfterViewInit {
   }
 
   centerMap(): void {
-    if (this.userService.selected.value && this.userService.selected.value.positionData.position) {
-      const selectedPosition = this.userService.selected.value.positionData.position;
-      this.map?.setView([selectedPosition.latitude, selectedPosition.longitude], 17, { animate: true });
+    console.log('putain',this.selected.address);
+    if (!this.selected.info.position) {
+      this.userService.addressSearch(this.selected.address).pipe(first()).subscribe((response: any) => {
+        console.log(response);
+        this.updateSelectedMarker(response[0].lat, response[0].lon);
+      })
+      //const selectedPosition = this.selected.value.info.position;
+      //console.log('selectedPosition = ', selectedPosition);
+      //this.map?.setView([selectedPosition.latitude, selectedPosition.longitude], 17, { animate: true });
       
       if (this.map) {
         // Supprimez tous les marqueurs existants de la carte
@@ -345,10 +384,14 @@ export class HomePage implements AfterViewInit {
         });
 
         // Ajoutez le marqueur avec la bonne position de heading
-        const heading = this.userService.selected.value.positionData.position.heading;
-        const coordinates: L.LatLngTuple = [selectedPosition.latitude, selectedPosition.longitude];
-        const marker = L.marker(coordinates, { icon: this.customIcon }).addTo(this.map);
+        //const heading = this.userService.selected.value.info.position.heading;
+        //const coordinates: L.LatLngTuple = [selectedPosition.latitude, selectedPosition.longitude];
+        //const marker = L.marker(coordinates, { icon: this.customIcon }).addTo(this.map);
       }
+    }
+    else {
+      console.log('fdp', this.selected)
+      this.updateSelectedMarker(this.selected.info.position.latitude, this.selected.info.position.longitude, this.selected.info.position.speed);
     }
   }
 

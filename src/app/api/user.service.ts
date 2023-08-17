@@ -19,6 +19,7 @@ export class UserService {
   public isLogged : boolean = false;
   public userDetails = new BehaviorSubject<any>(null);
   public trackers = new BehaviorSubject<any>(null);
+  public trackerType = new BehaviorSubject<any>('logoMarker');
   public positions: any;
   public tracking: any;
   public listtrackers: any[] = [];
@@ -105,5 +106,18 @@ export class UserService {
 
   reverseGeocode(latitude: any, longitude: any){
     return this.http.get('http://94.23.210.102/nominatim/reverse?format=geojson&lat=' + latitude + '&lon=' + longitude );
+  }
+
+  addressSearch(address: any){
+    /*address = {
+      number : '159',
+      street : 'rue de Tournai',
+      postcode : '7333',
+      city : 'tertre',
+      country : 'Belgium'  
+    }
+    */
+    console.log('http://94.23.210.102/nominatim/search?street='+address.house_number+'%20'+address.road+'&postalcode='+address.postcode+'%20&city='+address.town+'%20&country='+address.country+'&format=json')
+    return this.http.get('http://94.23.210.102/nominatim/search?street='+(address.house_number || '')+'%20'+address.road+'&postalcode='+address.postcode+'%20&city='+address.town+'%20&country='+address.country+'&format=json');
   }
 }

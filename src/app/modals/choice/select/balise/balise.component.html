@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar style="--background: #EC851E;" class="toolbar">
     <ion-title class="title">Balises</ion-title>
-    <ion-select [(ngModel)]="selectedType" (ionChange)="handleEvent($event)" interface="action-sheet" style="--background: #EC851E; color: white;">
+    <ion-select [(ngModel)]="selectedType" (ionChange)="handleEvent($event)" interface="popover" style="--background: #EC851E; color: white;">
       <ion-select-option value="vehicule">Véhicules</ion-select-option>
       <ion-select-option value="Batiments">Bâtiments</ion-select-option>
       <ion-select-option value="Autres">Autres</ion-select-option>
@@ -13,16 +13,18 @@
 </ion-header>
 <ion-content style="--background: black;">
   <ion-list style="background: black;">
-    <ng-container *ngFor="let tracker of getFilteredTrackers()">
-      <ion-item (click)="selectItem(tracker)" style="--background: black;border-bottom: solid 1px #EC851E;">
-        <ion-avatar slot="start">
-          <ion-img [src]="tracker.pictureUrl" *ngIf="tracker.pictureUrl"></ion-img>
-        </ion-avatar>
-        <ion-label style="color: white;">
-          <h2>{{tracker.name}}</h2>
-          <p>{{ tracker.address ? ((tracker.address.road ?? '') + ' ' + (tracker.address.house_number ?? '') + ', ' + (tracker.address.postcode ?? '') + ' ' + (tracker.address.town ?? '') + ', ' + (tracker.address.country ?? '')) : '' }}</p>
-        </ion-label>
-      </ion-item>
+    <ng-container *ngIf="filtered">
+      <ng-container *ngFor="let tracker of filtered">
+        <ion-item (click)="selectItem(tracker)" style="--background: black;border-bottom: solid 1px #EC851E;">
+          <ion-avatar slot="start">
+            <ion-img [src]="tracker.pictureUrl" *ngIf="tracker.pictureUrl"></ion-img>
+          </ion-avatar>
+          <ion-label style="color: white;">
+            <h2>{{tracker.name}}</h2>
+            <p>{{ tracker.address ? ((tracker.address.road ?? '') + ' ' + (tracker.address.house_number ?? '') + ', ' + (tracker.address.postcode ?? '') + ' ' + (tracker.address.town ?? '') + ', ' + (tracker.address.country ?? '')) : '' }}</p>
+          </ion-label>
+        </ion-item>
+      </ng-container>
     </ng-container>
   </ion-list>
 </ion-content>

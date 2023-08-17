@@ -18,7 +18,7 @@ export class BaliseComponent  implements OnInit {
   reverseGeocodedAddresses: any;
   trackerDetails: any;
   selectedType: string = 'vehicule';
-
+  filtered : any;
   constructor(private modalController: ModalController, public userService: UserService) {}
 
   httpOptions = {
@@ -30,6 +30,7 @@ export class BaliseComponent  implements OnInit {
   ngOnInit() {
     this.userService.trackers.subscribe((trackers: any) => {
       this.trackerDetails = trackers;
+      this.getFilteredTrackers();
     });
   }
 
@@ -40,21 +41,28 @@ export class BaliseComponent  implements OnInit {
   handleEvent(event: Event) {
     const customEvent = event as CustomEvent;
     this.selectedType = customEvent.detail.value;
+    this.getFilteredTrackers();
+
   }
 
   getFilteredTrackers() {
+    console.log('new',this.selectedType);
     switch (this.selectedType) {
         case 'vehicule':
-            return this.trackerDetails.trackers.filter((tracker: { info: { position: any; }; }) => tracker.info && tracker.info.position);
-
+            this.userService.trackerType.next('logoMarker');
+            this.filtered = this.trackerDetails.trackers.filter((tracker: { info: { position: any; }; }) => tracker.info && tracker.info.position);
+            break;
         case 'Batiments':
-            return this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/show?id=400');
-
+            this.userService.trackerType.next('marker4');
+            this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/show?id=400');
+            break;
         case 'Autres':
-            return this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/pics/buggy38.png');
-
+            this.userService.trackerType.next('test');
+            this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/pics/buggy38.png');
+            break;
         default:
-            return this.trackerDetails.trackers;
+            this.userService.trackerType.next('logoMarker');
+            this.filtered = this.trackerDetails.trackers;
     }
   }
 
