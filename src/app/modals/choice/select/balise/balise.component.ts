@@ -42,7 +42,6 @@ export class BaliseComponent  implements OnInit {
     const customEvent = event as CustomEvent;
     this.selectedType = customEvent.detail.value;
     this.getFilteredTrackers();
-
   }
 
   getFilteredTrackers() {
@@ -53,15 +52,15 @@ export class BaliseComponent  implements OnInit {
             this.filtered = this.trackerDetails.trackers.filter((tracker: { info: { position: any; }; }) => tracker.info && tracker.info.position);
             break;
         case 'Batiments':
-            this.userService.trackerType.next('marker4');
+            this.userService.trackerType.next('A77resized');
             this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/show?id=400');
             break;
         case 'Autres':
-            this.userService.trackerType.next('test');
+            this.userService.trackerType.next('A78');
             this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/pics/buggy38.png');
             break;
         default:
-            this.userService.trackerType.next('logoMarker');
+            this.userService.trackerType.next('LogoStop');
             this.filtered = this.trackerDetails.trackers;
     }
   }
