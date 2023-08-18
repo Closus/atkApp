@@ -11,32 +11,48 @@
 <ion-content style="--background: black;">
   <div class="infos" *ngIf="trips">
     <div class="user">
-      <span class="name">{{ data.trackerData.name }}</span>
+      <span class="name">{{ data.name }}</span>
       <span class="adresse">{{ data.address.road ?? '' }} {{ data.address.house_number ?? '' }}, {{ data.address.postcode ?? '' }} {{ data.address.town ?? '' }}</span>
     </div>
-    <!-- <table>
+     <table>
       <tr>
         <td class="left-table">Durée totale:</td>
-        <td class="right-table">Test</td>
+        <td class="right-table">{{ result.duration }}</td>
       </tr>
       <tr>
         <td class="left-table">Distance totale:</td>
-        <td class="right-table"></td>
+        <td class="right-table">{{ result.distance | number:'1.2-2' }} km</td>
       </tr>
       <tr>
         <td class="left-table">Vitesse moyenne:</td>
-        <td class="right-table"></td>
+        <td class="right-table">{{ result.avgspeed | number:'1.2-2' }} km/h</td>
       </tr>
       <tr>
         <td class="left-table">Vitesse maximale:</td>
-        <td class="right-table">{{ data.positionData.maxspeed }}</td>
+        <td class="right-table">{{ result.maxspeed }} km/h</td>
       </tr>
-    </table> -->
+    </table>
   </div>
   <ion-list style="background: black;">
     <ion-item *ngFor="let trip of trips; index as tripIndex" (click)="centerMapOnLabel(trip)" style="--background: black;">
-      <ion-label style="color: #EC851E;">
-        {{ tripIndex+1 }}
+      <ion-label style="color: #EC851E; display: flex; justify-content: flex-start; align-items: center;">
+        
+        <!-- Section gauche : index, duration et distance -->
+        <div style="display: flex; flex-direction: row; align-items: center; margin-right: 20px;">
+          <span style="margin-right: 10px;">{{ tripIndex+1 }}</span>
+          
+          <div style="display: flex; flex-direction: column;">
+            <span>{{ trip.duration }}</span>
+            <span>{{ trip.distance | number:'1.2-2' }} km</span>
+          </div>
+        </div>
+  
+        <!-- Section droite : adresse -->
+        <div style="flex: 1;">
+          <div>{{ addresses[tripIndex].street }}</div>
+          <div>{{ addresses[tripIndex].city }}</div>
+        </div>
+        
       </ion-label>
     </ion-item>
   </ion-list>

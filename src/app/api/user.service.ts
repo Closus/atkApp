@@ -25,6 +25,7 @@ export class UserService {
   public listtrackers: any[] = [];
   combinedData: any[] = [];
   public selected = new BehaviorSubject<any>(null);
+  public tripDataDate: any;
 
   constructor(private http: HttpClient, private navController: NavController) { }
 

@@ -8,6 +8,7 @@ import { TripListModalComponent } from '../modals/trip-list-modal/trip-list-moda
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
 import { BehaviorSubject, first } from 'rxjs';
 import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } from 'ion2-calendar';
+import { SharedDataService } from '../api/shared-data.service';
 
 @Component({
     selector: 'app-home',
@@ -41,7 +42,7 @@ export class HomePage implements AfterViewInit {
   stepNumber: number = 1;
   trips: any;
 
-  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, public tripListModal: TripListModalComponent, private baliseComponent: BaliseComponent ) {
+  constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, private sharedDataService: SharedDataService) {
     this.userService.trackerType.subscribe((trackerType: any) => {
       console.log(trackerType);
       if (trackerType === 'logoMarker') {
@@ -287,12 +288,13 @@ export class HomePage implements AfterViewInit {
     console.log(this.userDetails.user.uuid);
     if (this.numberDate) {
       this.userService.getTripByDate('gettrip', this.selected.id, this.numberDate, this.userDetails.user.uuid).subscribe((data: any) => {
-        this.tripDataDate = data;
+        this.sharedDataService.setTripDataDate(data.tracking);
+        console.log(data.tracking, 'on est ici ou kwéééééé');
         const tripCoordinates: L.LatLng[][] = [];
-        console.log('data du trip par jour = 1', this.tripDataDate);
+        console.log('data du trip par jour = 1', this.sharedDataService.tripDataDate);
   
-        if (this.tripDataDate && this.tripDataDate.tracking && this.tripDataDate.tracking.trips && this.tripDataDate.tracking.trips.length > 0) {
-          this.tripDataDate.tracking.trips.forEach((trip: any, index: any) => {
+        if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
+          this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
             const tripSteps: L.LatLng[] = trip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude)));
             tripCoordinates.push(tripSteps);
   
@@ -353,7 +355,7 @@ export class HomePage implements AfterViewInit {
             }
           });
 
-          console.log('data du trip par jour = ', this.tripDataDate);
+          console.log('data du trip par jour = ', this.sharedDataService.tripDataDate);
   
           // Création d'un objet bounds utilisant toutes les coordonnées du voyage
           const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
@@ -372,7 +374,7 @@ export class HomePage implements AfterViewInit {
     const modal = await this.modalController.create({
       component: TripListModalComponent,
       componentProps: {
-        trips: this.tripDataDate.tracking.trips
+        trips: this.sharedDataService.tripDataDate.trips
       }
     });
 
