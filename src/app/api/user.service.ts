@@ -110,7 +110,6 @@ export class UserService {
   }
 
   addressSearch(address: any){
-    console.log('http://94.23.210.102/nominatim/search?street='+address.house_number+'%20'+address.road+'&postalcode='+address.postcode+'%20&city='+address.town+'%20&country='+address.country+'&format=json')
     return this.http.get('http://94.23.210.102/nominatim/search?street='+(address.house_number || '')+'%20'+address.road+'&postalcode='+address.postcode+'%20&city='+address.town+'%20&country='+address.country+'&format=json');
   }
 }

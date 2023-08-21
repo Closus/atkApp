@@ -3,8 +3,8 @@
     <ion-title class="title">Balises</ion-title>
     <ion-select [(ngModel)]="selectedType" (ionChange)="handleEvent($event)" interface="popover" style="--background: #EC851E; color: white;">
       <ion-select-option value="vehicule">Véhicules</ion-select-option>
-      <ion-select-option value="Batiments">Bâtiments</ion-select-option>
-      <ion-select-option value="Autres">Autres</ion-select-option>
+      <ion-select-option value="Autres">Personnes</ion-select-option>
+      <ion-select-option value="Batiments">Autres</ion-select-option>
     </ion-select> 
     <ion-buttons slot="end">
       <ion-button (click)="closeModal()" style="color: white;">Close</ion-button>

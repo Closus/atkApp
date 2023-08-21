@@ -41,11 +41,6 @@ export class HomePage implements AfterViewInit {
   currentRotation: number = 0;
   stepNumber: number = 1;
   trips: any;
-  stoppedIcon = L.icon({
-    iconUrl: '../../assets/images/LogoStop.png',
-    iconSize: [100, 100],
-    iconAnchor: [50, 50]
-  });
 
   constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, private sharedDataService: SharedDataService) {
     this.userService.trackerType.subscribe((trackerType: any) => {
@@ -128,32 +123,6 @@ export class HomePage implements AfterViewInit {
     });
   }
 
-  //     // Créez un nouveau marqueur avec les nouvelles coordonnées
-  //     const marker = L.marker(coordinates, { icon: customIcon });
-  //     marker.bindPopup(`<div class="custom-popup" style="background: black;">
-  //                         <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
-  //                         <p style="text-align: center;">${selected.address.road ?? ''} ${selected.address.house_number ?? ''}, ${selected.address.postcode ?? ''} ${selected.address.town ?? ''}</p>
-  //                         <table style="width: 100%;">
-  //                           <tr>
-  //                             <th style="color: #EC851E;">Durée Trajet:</th>
-  //                             <th style="color: #EC851E;">Vitesse:</th>
-  //                           </tr>
-  //                           <tr>
-  //                             <td></td>
-  //                             <td>${selected.info.position.speed} km/h</td>
-  //                           </tr>
-  //                           <tr>
-  //                             <th style="color: #EC851E;">Distance Trajet:</td>
-  //                             <th style="color: #EC851E;">Altitude:</td>
-  //                           </tr>
-  //                           <tr>
-  //                             <td> km</td>
-  //                             <td>${selected.info.position.altitude} m</td>
-  //                           </tr>
-  //                         </table>
-  //                       </div>`
-  //                     );
-
   updateSelectedMarker(latitude : any, longitude : any, speed?: any): void {
     this.clearMap();
     console.log('LAAAAAAAA', latitude);
@@ -169,8 +138,10 @@ export class HomePage implements AfterViewInit {
 
       // Create a marker for the selected coordinates
       const marker = L.marker(coordinates);
-      marker.bindPopup
-      (`<div class="custom-popup" style="background: black;">
+          
+      // Créez un nouveau marqueur avec les nouvelles coordonnées
+      marker.bindPopup(`
+        <div class="custom-popup" style="background: black;">
           <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
           <p style="text-align: center;">${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}</p>
           <table style="width: 100%;">
@@ -191,30 +162,27 @@ export class HomePage implements AfterViewInit {
               <td>${this.selected.info.position.altitude} m</td>
             </tr>
           </table>
-        </div>
-      `);
-      
-    // Apply the rotation when the marker is added and after any zoom operations
-    const applyRotation = () => {
-      const markerElement = marker.getElement();
-      if (markerElement) {
-          // Extract the current Leaflet transformations
-          const currentTransform = markerElement.style.transform;
-
-          // Apply our rotation on top of the current transformation
-          markerElement.style.transform = `${currentTransform} rotate(${this.selected.info.position.heading}deg)`;
-      }
-    };
+        </div>`
+      );
 
       // Check if the vehicle speed is 0.0
-      if ((speed && speed === '0.0')) {
+      if (speed && speed === '0.0') {
         console.log('iciiiiiiii', speed); 
-        marker.setIcon(this.stoppedIcon);
+        // !!! VENIR DIRE QU IL CHANGE DE TYPE 
+        marker.setIcon(this.Icon);
       } else if (speed) {
-        marker.on('add', applyRotation);        
+        marker.setIcon(this.Icon);
+        marker.on('add', () => {
+          const markerElement = marker.getElement();
+          if (markerElement) {
+            console.log(markerElement, 'okokokokokok');      
+            markerElement.style.transform += `rotate(${this.selected.info.position.heading}deg)`;
+          }
+        });
       } else {
         marker.setIcon(this.Icon);
       }
+
       // Add the marker to the map
       if (this.map) {
         marker.addTo(this.map);
@@ -315,6 +283,7 @@ export class HomePage implements AfterViewInit {
 
   selectedDateTrip() {
     this.isTripSelected = true;
+    this.clearMap();
     console.log(this.selected.id);
     console.log(this.numberDate);
     console.log(this.userDetails.user.uuid);
@@ -443,4 +412,3 @@ export class HomePage implements AfterViewInit {
     this.isTripSelected = false;
   }
 }
-

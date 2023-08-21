@@ -58,11 +58,11 @@ export class BaliseComponent  implements OnInit {
           });  
           break;
         case 'Batiments':
-            this.userService.trackerType.next('A77resized');
+            this.userService.trackerType.next('A78');
             this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/show?id=400');
             break;
         case 'Autres':
-            this.userService.trackerType.next('A78');
+            this.userService.trackerType.next('A77resized');
             this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/pics/buggy38.png');
             break;
         default:
