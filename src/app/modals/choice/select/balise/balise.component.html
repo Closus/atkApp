@@ -19,6 +19,15 @@
           <ion-avatar slot="start">
             <ion-img [src]="tracker.pictureUrl" *ngIf="tracker.pictureUrl"></ion-img>
           </ion-avatar>
+          <ion-icon name="stop-circle-outline"
+              *ngIf="selectedType === 'vehicule' && tracker.info && tracker.info.position.speed === '0.0'"
+              style="color: red">
+          </ion-icon>
+          <ion-icon name="arrow-up-outline"
+              *ngIf="selectedType === 'vehicule' && tracker.info && tracker.info.position.speed !== '0.0' && 'position' in tracker.info && 'heading' in tracker.info.position"
+              [style.transform]="'rotate(' + tracker.info.position.heading + 'deg)'"
+              style="color: green">
+          </ion-icon>
           <ion-label style="color: white;">
             <h2>{{tracker.name}}</h2>
             <p>{{ tracker.address ? ((tracker.address.road ?? '') + ' ' + (tracker.address.house_number ?? '') + ', ' + (tracker.address.postcode ?? '') + ' ' + (tracker.address.town ?? '') + ', ' + (tracker.address.country ?? '')) : '' }}</p>

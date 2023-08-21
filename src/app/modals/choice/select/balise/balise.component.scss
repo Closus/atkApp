@@ -1,3 +1,18 @@
 .title {
   color: white;
 }
+
+::ng-deep .item-radio-checked.sc-ion-select-popover-md {
+  --color: #EC851E!important;
+  --background: black!important;
+  --background-focused: black!important;
+}
+
+::ng-deep .sc-ion-select-popover-md {
+  --background: black!important;
+  background: black!important;
+}
+
+::ng-deep .select-interface-option {
+  color: white!important;
+}

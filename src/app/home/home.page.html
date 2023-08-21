@@ -32,17 +32,17 @@
     </ion-toolbar>
   </ion-header>
   <div class="menu-items">
-    <span class="select" (click)="presentModal()"><fa-icon icon="satellite-dish"></fa-icon></span>
-    <span class="center" (click)="centerMap()"><fa-icon icon="arrows-to-eye"></fa-icon></span>
+    <span class="select" (click)="presentModal()"><ion-icon name="radio-outline" size="large"></ion-icon></span>
+    <span class="center" (click)="centerMap()"><ion-icon name="locate-outline" size="large"></ion-icon></span>
     <ng-container *ngIf="numberDate">
-      <span class="history" (click)="selectedDateTrip()"><fa-icon icon="clock-rotate-left"></fa-icon></span>
+      <span class="history" (click)="selectedDateTrip()"><ion-icon name="analytics-outline" size="large"></ion-icon></span>
     </ng-container>    
     <!-- Condition sans date sélectionnée -->
     <ng-container *ngIf="!numberDate">
-      <span class="history" (click)="selectedTrip()"><fa-icon icon="clock-rotate-left"></fa-icon></span>
+      <span class="history" (click)="selectedTrip()"><ion-icon name="analytics-outline" size="large"></ion-icon></span>
     </ng-container>
-    <span class="calendar" (click)="openCalendar()"><fa-icon icon="calendar-alt"></fa-icon></span>
-    <span class="itinerary" (click)="launchNavigation()"><fa-icon icon="location-arrow"></fa-icon></span>
+    <span class="calendar" (click)="openCalendar()"><ion-icon name="calendar-outline" size="large"></ion-icon></span>
+    <span class="itinerary" (click)="launchNavigation()"><ion-icon name="navigate-circle-outline" size="large"></ion-icon></span>
   </div>
   <ion-content>
     <div id="mapId" class="mapId"></div>
