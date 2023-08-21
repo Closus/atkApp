@@ -299,11 +299,16 @@ export class HomePage implements AfterViewInit {
       this.map.eachLayer((layer) => {
         if (layer instanceof L.MarkerClusterGroup) {
           layer.on('clusterclick', (cluster) => {
-            cluster.layer.getAllChildMarkers().forEach((marker: any) => {
-              marker.on('click', () => {
+            if (cluster.layer.getAllChildMarkers().length > 1) {
+              // Supprimez le cluster pour pouvoir afficher les marqueurs individuels
+              this.map?.removeLayer(cluster.layer);
+    
+              // Ajoutez les marqueurs individuels à la carte
+              cluster.layer.getAllChildMarkers().forEach((marker: any) => {
+                marker.addTo(this.map);
                 marker.openPopup();
               });
-            });
+            }
           });
         }
       });
@@ -464,6 +469,15 @@ selectedDateTrip() {
 
             const tripCoordinates: L.LatLng[][] = [];
             const markersCluster = L.markerClusterGroup();  // Création du groupe de clusters
+            // !!! Changer le cluster
+            // const markersCluster = L.markerClusterGroup({
+            //   iconCreateFunction: function(cluster) {
+            //     return L.icon({
+            //       iconUrl: 'blue-cluster-icon.png',
+            //       iconSize: [40, 40]
+            //     });
+            //   }
+            // });
 
             if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
                 this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
