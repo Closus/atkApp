@@ -41,7 +41,7 @@
                   "output": "./svg"
                 }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss", "./node_modules/ionicons/dist/css/ionicons.min.css"],
+            "styles": ["src/theme/variables.scss", "src/global.scss"],
             "scripts": []
           },
           "configurations": {
@@ -121,7 +121,7 @@
                 "output": "./svg"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss", "./node_modules/ionicons/dist/css/ionicons.min.css"],
+            "styles": ["src/theme/variables.scss", "src/global.scss"],
             "scripts": []
           },
           "configurations": {

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { TripListModalComponent } from '../modals/trip-list-modal/trip-list-modal.component';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
-import { BehaviorSubject, Subscription, first } from 'rxjs';
+import { Subscription, first } from 'rxjs';
 import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } from 'ion2-calendar';
 import { SharedDataService } from '../api/shared-data.service';
 
