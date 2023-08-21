@@ -23,7 +23,7 @@
               *ngIf="selectedType === 'vehicule' && tracker.info && tracker.info.position.speed === '0.0'"
               style="color: red">
           </ion-icon>
-          <ion-icon name="arrow-up-outline"
+          <ion-icon name="arrow-up-circle-outline"
               *ngIf="selectedType === 'vehicule' && tracker.info && tracker.info.position.speed !== '0.0' && 'position' in tracker.info && 'heading' in tracker.info.position"
               [style.transform]="'rotate(' + tracker.info.position.heading + 'deg)'"
               style="color: green">

@@ -9,6 +9,7 @@ import { BaliseComponent } from '../modals/choice/select/balise/balise.component
 import { Subscription, first } from 'rxjs';
 import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } from 'ion2-calendar';
 import { SharedDataService } from '../api/shared-data.service';
+import 'leaflet.markercluster';
 
 @Component({
     selector: 'app-home',
@@ -304,7 +305,9 @@ export class HomePage implements AfterViewInit {
     const options: CalendarModalOptions = {
       color: 'dark', // Couleur du calendrier (noir),
       title: 'Sélectionnez une date', // Titre du calendrier
-      canBackwardsSelected: true, // Autorise la sélection de dates antérieures
+      canBackwardsSelected: true, // Autorise la sélection de dates antérieures,
+      weekStart: 1,
+      weekdays: ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'],
       defaultDate: this.selectedDate ? new Date(this.selectedDate) : new Date() // Date par défaut (la date sélectionnée ou la date actuelle)
     };
     
@@ -340,94 +343,161 @@ export class HomePage implements AfterViewInit {
     });
   }
 
-  selectedDateTrip() {
+  // selectedDateTrip() {
+  //   this.clearMap();
+  //   this.isTripSelected = true;
+  //   console.log(this.selected.id);
+  //   console.log(this.numberDate);
+  //   console.log(this.userDetails.user.uuid);
+  //   if (this.numberDate) {
+  //     this.userService.getTripByDate('gettrip', this.selected.id, this.numberDate, this.userDetails.user.uuid).subscribe((data: any) => {
+  //       this.sharedDataService.setTripDataDate(data.tracking);
+  //       console.log(data.tracking, 'on est ici ou kwéééééé');
+  //       const tripCoordinates: L.LatLng[][] = [];
+  //       console.log('data du trip par jour = 1', this.sharedDataService.tripDataDate);
+  
+  //       if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
+  //         this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
+  //           const tripSteps: L.LatLng[] = trip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude)));
+  //           tripCoordinates.push(tripSteps);
+  
+  //           if (this.map) {
+  //             const speed = parseFloat(trip.avgspeed).toFixed(2);
+  //             const distance = parseFloat(trip.distance).toFixed(2);
+  //             const duration = trip.duration;
+  //             const altitude = trip.maxspeed; // ou toute autre information d'altitude si elle est disponible
+  //             // const address = trip.address.features[0].properties; // Modifier selon la structure de l'adresse
+  //             const coordinates = tripSteps[0];
+
+  //             //Création d'un marqueur pour ce voyage spécifique
+  //               const tripMarker = L.circleMarker(tripSteps[0], {
+  //                 radius: 15,
+  //                 color: 'black',
+  //                 fillColor: 'white',
+  //                 fillOpacity: 1,
+  //                 weight: 2
+  //               }).addTo(this.map);
+  
+  //               // Affichage du numéro du voyage
+  //               tripMarker.bindTooltip(`<span style="font-size: 16px; font-weight: bold;">${index + 1}</span>`, {
+  //                 permanent: true,
+  //                 direction: 'center',
+  //                 className: 'step-marker-tooltip',
+  //                 opacity: 1
+  //               });
+  
+  //             // Créez le marqueur avec la popup
+  //             const marker = L.marker(coordinates);
+  //             tripMarker.bindPopup(`
+  //               <div class="custom-popup" style="background: black;">
+  //                 <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">Adresse</h5>
+  //                 <p style="text-align: center;">Nom balise</p>
+  //                 <table style="width: 100%;">
+  //                   <tr>
+  //                     <th style="color: #EC851E;">Durée Trajet:</th>
+  //                     <th style="color: #EC851E;">Vitesse max:</th>
+  //                   </tr>
+  //                   <tr>
+  //                     <td>${duration}</td>
+  //                     <td>${speed} km/h</td>
+  //                   </tr>
+  //                   <tr>
+  //                     <th style="color: #EC851E;">Distance Trajet:</td>
+  //                     <th style="color: #EC851E;">Altitude:</td>
+  //                   </tr>
+  //                   <tr>
+  //                     <td>${distance} km</td>
+  //                     <td>${altitude} m</td>
+  //                   </tr>
+  //                 </table>
+  //               </div>`
+  //             ).addTo(this.map);
+  
+  //             // Création d'un polyline pour le voyage
+  //             const tripPolyline = L.polyline(tripCoordinates[index], { color: 'red' }).addTo(this.map);
+  //           }
+  //         });
+
+  //         console.log('data du trip par jour = ', this.sharedDataService.tripDataDate);
+  
+  //         // Création d'un objet bounds utilisant toutes les coordonnées du voyage
+  //         const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
+  
+  //         // Ajustement de la vue de la carte pour s'adapter aux limites
+  //         if (this.map) {
+  //           this.map.fitBounds(bounds);
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
+
+
+selectedDateTrip() {
     this.clearMap();
     this.isTripSelected = true;
     console.log(this.selected.id);
     console.log(this.numberDate);
     console.log(this.userDetails.user.uuid);
+
     if (this.numberDate) {
-      this.userService.getTripByDate('gettrip', this.selected.id, this.numberDate, this.userDetails.user.uuid).subscribe((data: any) => {
-        this.sharedDataService.setTripDataDate(data.tracking);
-        console.log(data.tracking, 'on est ici ou kwéééééé');
-        const tripCoordinates: L.LatLng[][] = [];
-        console.log('data du trip par jour = 1', this.sharedDataService.tripDataDate);
-  
-        if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
-          this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
-            const tripSteps: L.LatLng[] = trip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude)));
-            tripCoordinates.push(tripSteps);
-  
-            if (this.map) {
-              const speed = parseFloat(trip.avgspeed).toFixed(2);
-              const distance = parseFloat(trip.distance).toFixed(2);
-              const duration = trip.duration;
-              const altitude = trip.maxspeed; // ou toute autre information d'altitude si elle est disponible
-              // const address = trip.address.features[0].properties; // Modifier selon la structure de l'adresse
-              const coordinates = tripSteps[0];
+        this.userService.getTripByDate('gettrip', this.selected.id, this.numberDate, this.userDetails.user.uuid).subscribe((data: any) => {
+            this.sharedDataService.setTripDataDate(data.tracking);
 
-              //Création d'un marqueur pour ce voyage spécifique
-                const tripMarker = L.circleMarker(tripSteps[0], {
-                  radius: 15,
-                  color: 'black',
-                  fillColor: 'white',
-                  fillOpacity: 1,
-                  weight: 2
-                }).addTo(this.map);
-  
-                // Affichage du numéro du voyage
-                tripMarker.bindTooltip(`<span style="font-size: 16px; font-weight: bold;">${index + 1}</span>`, {
-                  permanent: true,
-                  direction: 'center',
-                  className: 'step-marker-tooltip',
-                  opacity: 1
+            const tripCoordinates: L.LatLng[][] = [];
+            const markersCluster = L.markerClusterGroup();  // Création du groupe de clusters
+
+            if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
+                this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
+                    const tripSteps: L.LatLng[] = trip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude)));
+                    tripCoordinates.push(tripSteps);
+
+                    if (this.map) {
+                        const speed = parseFloat(trip.avgspeed).toFixed(2);
+                        const distance = parseFloat(trip.distance).toFixed(2);
+                        const duration = trip.duration;
+                        const altitude = trip.maxspeed;
+                        const coordinates = tripSteps[0];
+
+                        const tripMarker = L.circleMarker(tripSteps[0], {
+                            radius: 15,
+                            color: 'black',
+                            fillColor: 'white',
+                            fillOpacity: 1,
+                            weight: 2
+                        });
+
+                        tripMarker.bindTooltip(`<span style="font-size: 16px; font-weight: bold;">${index + 1}</span>`, {
+                            permanent: true,
+                            direction: 'center',
+                            className: 'step-marker-tooltip',
+                            opacity: 1
+                        });
+
+                        tripMarker.bindPopup(`
+                          <div class="custom-popup" style="background: black;">
+                            ...
+                          </div>`
+                        );
+
+                        markersCluster.addLayer(tripMarker);  // Ajout du marker au groupe de clusters
+
+                        const tripPolyline = L.polyline(tripCoordinates[index], { color: 'red' }).addTo(this.map);
+                    }
                 });
-  
-              // Créez le marqueur avec la popup
-              const marker = L.marker(coordinates);
-              tripMarker.bindPopup(`
-                <div class="custom-popup" style="background: black;">
-                  <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">Adresse</h5>
-                  <p style="text-align: center;">Nom balise</p>
-                  <table style="width: 100%;">
-                    <tr>
-                      <th style="color: #EC851E;">Durée Trajet:</th>
-                      <th style="color: #EC851E;">Vitesse max:</th>
-                    </tr>
-                    <tr>
-                      <td>${duration}</td>
-                      <td>${speed} km/h</td>
-                    </tr>
-                    <tr>
-                      <th style="color: #EC851E;">Distance Trajet:</td>
-                      <th style="color: #EC851E;">Altitude:</td>
-                    </tr>
-                    <tr>
-                      <td>${distance} km</td>
-                      <td>${altitude} m</td>
-                    </tr>
-                  </table>
-                </div>`
-              ).addTo(this.map);
-  
-              // Création d'un polyline pour le voyage
-              const tripPolyline = L.polyline(tripCoordinates[index], { color: 'red' }).addTo(this.map);
-            }
-          });
 
-          console.log('data du trip par jour = ', this.sharedDataService.tripDataDate);
-  
-          // Création d'un objet bounds utilisant toutes les coordonnées du voyage
-          const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
-  
-          // Ajustement de la vue de la carte pour s'adapter aux limites
-          if (this.map) {
-            this.map.fitBounds(bounds);
-          }
-        }
-      });
+                if (this.map) {
+
+                  this.map.addLayer(markersCluster);  // Ajout du groupe de clusters à la carte
+
+                  const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
+                  this.map.fitBounds(bounds);
+                }
+            }
+        });
     }
   }
+
   
 
   async openTripListModal() {
