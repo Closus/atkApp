@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import * as L from 'leaflet';
 import { TripListModalComponent } from '../modals/trip-list-modal/trip-list-modal.component';
 import { BaliseComponent } from '../modals/choice/select/balise/balise.component';
-import { BehaviorSubject, first } from 'rxjs';
+import { BehaviorSubject, Subscription, first } from 'rxjs';
 import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } from 'ion2-calendar';
 import { SharedDataService } from '../api/shared-data.service';
 
@@ -41,6 +41,13 @@ export class HomePage implements AfterViewInit {
   currentRotation: number = 0;
   stepNumber: number = 1;
   trips: any;
+  stoppedIcon = L.icon({
+    iconUrl: '../../assets/images/LogoStop.png',
+    iconSize: [100, 100],
+    iconAnchor: [50, 50],
+    className: 'rotate-icon'
+  });
+  selectedTripSubscription: Subscription | undefined;
 
   constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, private sharedDataService: SharedDataService) {
     this.userService.trackerType.subscribe((trackerType: any) => {
@@ -59,8 +66,31 @@ export class HomePage implements AfterViewInit {
           iconAnchor: [25, 50]
         });
       }
+      this.selectedTripSubscription = this.sharedDataService.selectedTrip$.subscribe(
+        (trip) => {
+          if (trip) {
+            this.centerOnTrip(trip);
+          }
+        }
+      );
     })
   }
+
+  centerOnTrip(trip: any): void {
+    const lat = parseFloat(trip.steps[0].latitude);
+    const lon = parseFloat(trip.steps[0].longitude);
+    console.log(lat, lon);
+    this.updateSelectedMarker(lat, lon);
+    if (this.map) {
+        this.map.eachLayer((layer) => {
+          if (layer instanceof L.Marker) {
+            if (this.map) {
+              this.map.removeLayer(layer);
+            }
+          }
+        });
+    }
+}
 
   ngOnInit() {
     this.userService.userDetails.pipe(first()).subscribe((users: any) => {
@@ -169,16 +199,16 @@ export class HomePage implements AfterViewInit {
       if (speed && speed === '0.0') {
         console.log('iciiiiiiii', speed); 
         // !!! VENIR DIRE QU IL CHANGE DE TYPE 
-        marker.setIcon(this.Icon);
+        marker.setIcon(this.stoppedIcon);
       } else if (speed) {
-        marker.setIcon(this.Icon);
-        marker.on('add', () => {
-          const markerElement = marker.getElement();
-          if (markerElement) {
-            console.log(markerElement, 'okokokokokok');      
-            markerElement.style.transform += `rotate(${this.selected.info.position.heading}deg)`;
-          }
-        });
+        this.createRotatedImage('../../assets/images/logoMarker.png', this.selected.info.position.heading, function(rotatedImgSrc: any) {
+          const rotatedIcon = L.icon({
+              iconUrl: rotatedImgSrc,
+              iconSize: [100, 100],
+              iconAnchor: [50, 50]
+          });
+          marker.setIcon(rotatedIcon);
+      });
       } else {
         marker.setIcon(this.Icon);
       }
@@ -188,6 +218,29 @@ export class HomePage implements AfterViewInit {
         marker.addTo(this.map);
       }
     }
+  }
+
+  createRotatedImage(src: any, rotationDegrees: any, callback: any) {
+    const img = new Image();
+    img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ajustez les dimensions du canvas si nécessaire
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Effectuez la rotation
+        ctx?.translate(canvas.width / 2, canvas.height / 2);
+        ctx?.rotate(rotationDegrees * Math.PI / 180);
+        ctx?.drawImage(img, -img.width / 2, -img.height / 2);
+
+        // Récupérez l'image tournée
+        const rotatedImgSrc = canvas.toDataURL('image/png');
+
+        callback(rotatedImgSrc);
+    };
+    img.src = src;
   }
 
   async presentModal() {
@@ -282,8 +335,8 @@ export class HomePage implements AfterViewInit {
   }
 
   selectedDateTrip() {
-    this.isTripSelected = true;
     this.clearMap();
+    this.isTripSelected = true;
     console.log(this.selected.id);
     console.log(this.numberDate);
     console.log(this.userDetails.user.uuid);

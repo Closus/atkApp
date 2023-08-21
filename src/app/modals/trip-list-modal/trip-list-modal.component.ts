@@ -40,13 +40,6 @@ export class TripListModalComponent {
     }
   }
 
-  // getAddressForTrip(latitude: any, longitude: any, index: number) {
-  //   this.userService.reverseGeocode(latitude, longitude).subscribe((address: any) => {
-  //     this.addresses[index] = address.features[0].properties;
-  //     console.log('Adresse pour le trip', index, ':', this.addresses[index]);
-  //   });
-  // }
-
   getAddressForTrip(latitude: any, longitude: any, index: number) {
     this.userService.reverseGeocode(latitude, longitude).subscribe((address: any) => {
         this.addresses[index] = address.features[0].properties;
@@ -75,7 +68,8 @@ export class TripListModalComponent {
   }
 
   centerMapOnLabel(trip: any) {
-    this.modalController.dismiss(trip.address.features[0].properties.display_name);
-  }
+    this.sharedDataService.setSelectedTrip(trip);
+    this.modalController.dismiss(trip);
+}
 }
 
