@@ -119,8 +119,14 @@ export class HomePage implements AfterViewInit {
     if (this.userDetails) {
       this.map = L.map('mapId').setView([50.4046, 4.3588], 9), { attributionControl: false };
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(this.map);
+      setTimeout(() => {
+        if (this.map) {
+          this.map.invalidateSize();
+        }
+      });
     }
   }
+
 
   openSideMenu() {
     this.menu.enable(true, 'myMenu');
