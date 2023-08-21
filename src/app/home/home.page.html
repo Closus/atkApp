@@ -46,7 +46,7 @@
   </div>
   <ion-content>
     <div id="mapId" class="mapId"></div>
-    <ion-button *ngIf="isTripSelected" expand="full" class="menu-button" (click)="openTripListModal()" color="success">
+    <ion-button *ngIf="isTripSelected || showButton" expand="full" class="menu-button" (click)="openTripListModal()" color="success">
       <ion-icon name="menu"></ion-icon>
     </ion-button>
     <app-trip-list-modal (labelSelected)="onLabelSelected($event)"></app-trip-list-modal>

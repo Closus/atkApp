@@ -49,6 +49,8 @@ export class HomePage implements AfterViewInit {
     className: 'rotate-icon'
   });
   selectedTripSubscription: Subscription | undefined;
+  showButton: boolean = false;
+  showClustersAndMarkers: boolean = false;
 
   constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, private sharedDataService: SharedDataService) {
     this.userService.trackerType.subscribe((trackerType: any) => {
@@ -91,7 +93,7 @@ export class HomePage implements AfterViewInit {
           }
         });
     }
-}
+  }
 
   ngOnInit() {
     this.userService.userDetails.pipe(first()).subscribe((users: any) => {
@@ -114,6 +116,7 @@ export class HomePage implements AfterViewInit {
         this.pageTitle = 'Accueil';
       }
     });
+    
   }
 
   ngAfterViewInit() {
@@ -127,7 +130,6 @@ export class HomePage implements AfterViewInit {
       });
     }
   }
-
 
   openSideMenu() {
     this.menu.enable(true, 'myMenu');
@@ -254,7 +256,7 @@ export class HomePage implements AfterViewInit {
     const modal = await this.modalController.create({
       component: BaliseComponent
     });
-    this.clearMap();
+    this.clearMarkersAndClusters();
     modal.onDidDismiss().then((data) => {
       this.userService.selected.next(data.data);
       this.selectedTracker = data.data;
@@ -279,7 +281,7 @@ export class HomePage implements AfterViewInit {
         this.updateSelectedMarker(response[0].lat, response[0].lon);
       })
       
-      if (this.map) {
+      if (this.map && !this.showClustersAndMarkers) {
         // Supprimez tous les marqueurs existants de la carte
         this.map.eachLayer((layer) => {
           if (layer instanceof L.Marker) {
@@ -291,6 +293,20 @@ export class HomePage implements AfterViewInit {
     else {
       console.log('fdp', this.selected)
       this.updateSelectedMarker(this.selected.info.position.latitude, this.selected.info.position.longitude, this.selected.info.position.speed);
+    }
+    // Ajoutez cet événement de clic pour les marqueurs individuels dans le cluster
+    if (this.showClustersAndMarkers && this.map) {
+      this.map.eachLayer((layer) => {
+        if (layer instanceof L.MarkerClusterGroup) {
+          layer.on('clusterclick', (cluster) => {
+            cluster.layer.getAllChildMarkers().forEach((marker: any) => {
+              marker.on('click', () => {
+                marker.openPopup();
+              });
+            });
+          });
+        }
+      });
     }
   }
 
@@ -436,11 +452,13 @@ export class HomePage implements AfterViewInit {
 selectedDateTrip() {
     this.clearMap();
     this.isTripSelected = true;
+    this.showClustersAndMarkers = true;
     console.log(this.selected.id);
     console.log(this.numberDate);
     console.log(this.userDetails.user.uuid);
 
     if (this.numberDate) {
+      if (this.showClustersAndMarkers) {
         this.userService.getTripByDate('gettrip', this.selected.id, this.numberDate, this.userDetails.user.uuid).subscribe((data: any) => {
             this.sharedDataService.setTripDataDate(data.tracking);
 
@@ -475,9 +493,28 @@ selectedDateTrip() {
                         });
 
                         tripMarker.bindPopup(`
-                          <div class="custom-popup" style="background: black;">
-                            ...
-                          </div>`
+                        <div class="custom-popup" style="background: black;">
+                                         <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">Adresse</h5>
+                                         <p style="text-align: center;">Nom balise</p>
+                                         <table style="width: 100%;">
+                                           <tr>
+                                             <th style="color: #EC851E;">Durée Trajet:</th>
+                                             <th style="color: #EC851E;">Vitesse max:</th>
+                                           </tr>
+                                           <tr>
+                                             <td>${duration}</td>
+                                             <td>${speed} km/h</td>
+                                           </tr>
+                                           <tr>
+                                             <th style="color: #EC851E;">Distance Trajet:</td>
+                                             <th style="color: #EC851E;">Altitude:</td>
+                                           </tr>
+                                           <tr>
+                                             <td>${distance} km</td>
+                                             <td>${altitude} m</td>
+                                           </tr>
+                                         </table>
+                                       </div>`
                         );
 
                         markersCluster.addLayer(tripMarker);  // Ajout du marker au groupe de clusters
@@ -495,12 +532,12 @@ selectedDateTrip() {
                 }
             }
         });
+      }
     }
   }
 
-  
-
   async openTripListModal() {
+    this.showButton = true;
     const modal = await this.modalController.create({
       component: TripListModalComponent,
       componentProps: {
@@ -513,6 +550,7 @@ selectedDateTrip() {
         this.onLabelSelected(result.data);
         console.log(result.data);
       }
+      this.showButton = false;
     })
     return await modal.present();
   }
@@ -526,6 +564,9 @@ selectedDateTrip() {
       if (!isNaN(latitude) && !isNaN(longitude)) {
         const coordinates = L.latLng(latitude, longitude);
         this.map?.setView(coordinates, 15, { animate: true });
+        if(this.map) {
+          const tripPolyline = L.polyline(selectedTrip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude))), { color: 'red' }).addTo(this.map);
+        }
       }
     }
   }
@@ -533,11 +574,21 @@ selectedDateTrip() {
   clearMap() {
     if (this.map) {
       this.map.eachLayer((layer: any) => {
-        if (layer instanceof L.Marker || layer instanceof L.Polyline || layer instanceof L.CircleMarker) {
+        if (layer instanceof L.Marker ||  layer instanceof L.CircleMarker) {
           this.map?.removeLayer(layer);
         }
       });
     }
     this.isTripSelected = false;
+  }
+
+  clearMarkersAndClusters(): void {
+    if (this.map) {
+      this.map.eachLayer((layer: any) => {
+        if (layer instanceof L.Marker || layer instanceof L.MarkerClusterGroup || layer instanceof L.CircleMarker || layer instanceof L.Polyline) {
+          this.map?.removeLayer(layer);
+        }
+      });
+    }
   }
 }
