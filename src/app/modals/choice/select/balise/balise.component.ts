@@ -47,10 +47,16 @@ export class BaliseComponent  implements OnInit {
   getFilteredTrackers() {
     console.log('new',this.selectedType);
     switch (this.selectedType) {
-        case 'vehicule':
-            this.userService.trackerType.next('logoMarker');
-            this.filtered = this.trackerDetails.trackers.filter((tracker: { info: { position: any; }; }) => tracker.info && tracker.info.position);
-            break;
+        case 'vehicule':         
+          this.filtered = this.trackerDetails.trackers.filter((tracker: { info: { position: any; }; }) => tracker.info && tracker.info.position);
+          this.filtered.forEach((tracker: any) => {
+            if (this.trackerDetails.info.speed === '0.0') {
+              this.userService.trackerType.next('LogoStop');
+            } else {
+              this.userService.trackerType.next('logoMarker');
+            }
+          });  
+          break;
         case 'Batiments':
             this.userService.trackerType.next('A77resized');
             this.filtered = this.trackerDetails.trackers.filter((tracker: { pictureUrl: string; }) => tracker.pictureUrl === 'http://geo.autotracking.eu/show?id=400');

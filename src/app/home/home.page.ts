@@ -41,6 +41,11 @@ export class HomePage implements AfterViewInit {
   currentRotation: number = 0;
   stepNumber: number = 1;
   trips: any;
+  stoppedIcon = L.icon({
+    iconUrl: '../../assets/images/LogoStop.png',
+    iconSize: [100, 100],
+    iconAnchor: [50, 50]
+  });
 
   constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, private sharedDataService: SharedDataService) {
     this.userService.trackerType.subscribe((trackerType: any) => {
@@ -164,25 +169,52 @@ export class HomePage implements AfterViewInit {
 
       // Create a marker for the selected coordinates
       const marker = L.marker(coordinates);
+      marker.bindPopup
+      (`<div class="custom-popup" style="background: black;">
+          <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
+          <p style="text-align: center;">${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}</p>
+          <table style="width: 100%;">
+            <tr>
+              <th style="color: #EC851E;">Durée Trajet:</th>
+              <th style="color: #EC851E;">Vitesse:</th>
+            </tr>
+            <tr>
+              <td></td>
+              <td>${this.selected.info.position.speed} km/h</td>
+            </tr>
+            <tr>
+              <th style="color: #EC851E;">Distance Trajet:</td>
+              <th style="color: #EC851E;">Altitude:</td>
+            </tr>
+            <tr>
+              <td> km</td>
+              <td>${this.selected.info.position.altitude} m</td>
+            </tr>
+          </table>
+        </div>
+      `);
+      
+    // Apply the rotation when the marker is added and after any zoom operations
+    const applyRotation = () => {
+      const markerElement = marker.getElement();
+      if (markerElement) {
+          // Extract the current Leaflet transformations
+          const currentTransform = markerElement.style.transform;
+
+          // Apply our rotation on top of the current transformation
+          markerElement.style.transform = `${currentTransform} rotate(${this.selected.info.position.heading}deg)`;
+      }
+    };
 
       // Check if the vehicle speed is 0.0
-      if (speed && speed === '0.0') {
+      if ((speed && speed === '0.0')) {
         console.log('iciiiiiiii', speed); 
-        // !!! VENIR DIRE QU IL CHANGE DE TYPE 
-        marker.setIcon(this.Icon);
+        marker.setIcon(this.stoppedIcon);
       } else if (speed) {
-        marker.setIcon(this.Icon);
-        marker.on('add', () => {
-          const markerElement = marker.getElement();
-          if (markerElement) {
-            console.log(markerElement, 'okokokokokok');      
-            markerElement.style.transform += `rotate(${this.selected.info.position.heading}deg)`;
-          }
-        });
+        marker.on('add', applyRotation);        
       } else {
         marker.setIcon(this.Icon);
       }
-
       // Add the marker to the map
       if (this.map) {
         marker.addTo(this.map);
@@ -411,5 +443,4 @@ export class HomePage implements AfterViewInit {
     this.isTripSelected = false;
   }
 }
-
 
