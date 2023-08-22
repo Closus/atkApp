@@ -13,7 +13,15 @@
   background: black;
 }
 
-::ng-deep .days-btn p {
+::ng-deep .dark .days .days-btn p {
+  color: #EC851E!important;
+}
+
+::ng-deep p {
+  color: #EC851E!important;
+}
+
+p {
   color: #EC851E!important;
 }
 
@@ -23,6 +31,10 @@
 }
 
 ::ng-deep ul {
+  color: #EC851E!important;
+}
+
+ul {
   color: #EC851E!important;
 }
 
