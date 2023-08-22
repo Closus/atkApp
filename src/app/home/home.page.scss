@@ -145,3 +145,15 @@ span {
   width: 100px;
   height: 100px;
 }
+
+::ng-deep .marker-cluster-small {
+  background-color: rgb(23 14 216 / 60%);
+}
+
+::ng-deep .marker-cluster-small div {
+  background-color: rgb(1 0 233 / 80%);
+}
+
+::ng-deep .marker-cluster span {
+    color: white;
+}
