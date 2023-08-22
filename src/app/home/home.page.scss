@@ -147,13 +147,32 @@ span {
 }
 
 ::ng-deep .marker-cluster-small {
-  background-color: rgb(23 14 216 / 60%);
+  background-color: rgb(34 66 124 / 60%);
 }
 
 ::ng-deep .marker-cluster-small div {
-  background-color: rgb(1 0 233 / 80%);
+  background-color: rgb(0 128 255 / 80%);
 }
 
 ::ng-deep .marker-cluster span {
     color: white;
+}
+
+::ng-deep .toolbar-background {
+  background: black!important;
+  color: #EC851E;
+}
+
+::ng-deep .week-toolbar.dark {
+  --background: black!important;
+  color: #EC851E;
+}
+
+::ng-deep .dark .week-title {
+  color: #EC851E;
+  background: black;
+}
+
+::ng-deep .days-btn p {
+  color: #EC851E;
 }

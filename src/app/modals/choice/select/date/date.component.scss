@@ -1,0 +1,18 @@
+::ng-deep .toolbar-background {
+  background: black!important;
+  color: #EC851E;
+}
+
+::ng-deep .week-toolbar.dark {
+  --background: black!important;
+  color: #EC851E;
+}
+
+::ng-deep .dark .week-title {
+  color: #EC851E;
+  background: black;
+}
+
+::ng-deep .days-btn p {
+  color: #EC851E;
+}
