@@ -41,14 +41,14 @@
         <div style="display: flex; flex-direction: row; align-items: center; margin-right: 20px;">
           <span style="margin-right: 10px;">{{ tripIndex+1 }}</span>
           
-          <div style="display: flex; flex-direction: column;">
+          <div style="display: flex; flex-direction: column; color: #888!important;">
             <span>{{ trip.duration }}</span>
             <span>{{ trip.distance | number:'1.2-2' }} km</span>
           </div>
         </div>
   
         <!-- Section droite : adresse -->
-        <div style="flex: 1;">
+        <div style="flex: 1; color: white!important;">
           <div>{{ addresses[tripIndex].street }}</div>
           <div>{{ addresses[tripIndex].city }}</div>
         </div>
