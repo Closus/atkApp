@@ -14,5 +14,18 @@
 }
 
 ::ng-deep .days-btn p {
-  color: #EC851E;
+  color: #EC851E!important;
+}
+
+::ng-deep toolbar-container {
+  --background: black!important;
+  color: #EC851E!important;
+}
+
+::ng-deep ul {
+  color: #EC851E!important;
+}
+
+::ng-deep h4 {
+  color: white!important;
 }
