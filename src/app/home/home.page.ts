@@ -11,6 +11,7 @@ import { CalendarModal, CalendarModalOptions, CalendarResult, CalendarModule } f
 import { SharedDataService } from '../api/shared-data.service';
 import 'leaflet.markercluster';
 
+// Déclaration du composant
 @Component({
     selector: 'app-home',
     templateUrl: 'home.page.html',
@@ -20,41 +21,45 @@ import 'leaflet.markercluster';
     imports: [IonicModule, FontAwesomeModule, CalendarModule, CommonModule, TripListModalComponent]
 })
 
+// Classe HomePage
 export class HomePage implements AfterViewInit {
-  userDetails : any;
-  trackerDetails : any;
-  map: L.Map | undefined;
-  email: string | undefined;
-  name: string | undefined;
-  mobile: string | undefined;
-  selected : any;
-  pageTitle: string = 'Accueil';  
-  selectedDate: string | undefined;
-  numberDate: string | undefined;
-  selectedTracker: any = null;
-  markers: L.Marker[] = [];
-  tripData: any;
-  tripDataDate : any;
-  addressData: any = {};
-  previousCoordinates: L.LatLng | null = null;
-  Icon : any;
-  isTripSelected: boolean = false;
-  currentRotation: number = 0;
-  stepNumber: number = 1;
-  trips: any;
-  stoppedIcon = L.icon({
+  userDetails : any; // Détails de l'utilisateur
+  trackerDetails : any; // Détails du tracker
+  map: L.Map | undefined; // Carte Leaflet
+  email: string | undefined; // Email de l'utilisateur
+  name: string | undefined; // Nom de l'utilisateur
+  mobile: string | undefined; // Numéro de mobile de l'utilisateur
+  selected : any; // Élément sélectionné
+  pageTitle: string = 'Accueil';  // Titre de la page
+  selectedDate: string | undefined; // Date sélectionnée
+  numberDate: string | undefined; // Date en format numérique
+  selectedTracker: any = null; // Tracker sélectionné
+  markers: L.Marker[] = []; // Marqueurs sur la carte
+  tripData: any; // Données du voyage
+  tripDataDate : any; // Données du voyage par date
+  addressData: any = {}; // Données de l'adresse
+  previousCoordinates: L.LatLng | null = null; // Coordonnées précédentes
+  Icon : any; // Icône pour le marqueur
+  isTripSelected: boolean = false; // Indique si un voyage est sélectionné
+  currentRotation: number = 0; // Rotation actuelle de l'icône
+  stepNumber: number = 1; // Numéro de l'étape du voyage
+  trips: any; // Voyages
+  stoppedIcon = L.icon({ // Icône pour le véhicule arrêté
     iconUrl: '../../assets/images/LogoStop.png',
     iconSize: [100, 100],
     iconAnchor: [50, 50],
     className: 'rotate-icon'
   });
-  selectedTripSubscription: Subscription | undefined;
-  showButton: boolean = false;
-  showClustersAndMarkers: boolean = false;
+  selectedTripSubscription: Subscription | undefined; // Abonnement au voyage sélectionné
+  showButton: boolean = false; // Indique si le bouton doit être affiché
+  showClustersAndMarkers: boolean = false; // Indique si les clusters et les marqueurs doivent être affichés
 
+  // Constructeur de la classe HomePage
   constructor(private menu: MenuController, public modalController: ModalController, private userService: UserService, private navController: NavController, private sharedDataService: SharedDataService) {
+    // Abonnement au type de tracker
     this.userService.trackerType.subscribe((trackerType: any) => {
       console.log(trackerType);
+      // Si le type de tracker est 'logoMarker', utilisez une icône spécifique
       if (trackerType === 'logoMarker') {
         this.Icon = L.icon({
           iconUrl: '../../assets/images/'+trackerType+'.png',
@@ -63,15 +68,18 @@ export class HomePage implements AfterViewInit {
           className: 'rotate-icon'
         });
       } else {
+        // Sinon, utilisez une autre icône
         this.Icon = L.icon({
           iconUrl: '../../assets/images/'+trackerType+'.png',
           iconSize: [50, 50],
           iconAnchor: [25, 50]
         });
       }
+      // Abonnement au voyage sélectionné
       this.selectedTripSubscription = this.sharedDataService.selectedTrip$.subscribe(
         (trip) => {
           if (trip) {
+            // Si un voyage est sélectionné, centrez la carte sur ce voyage
             this.centerOnTrip(trip);
           }
         }
@@ -152,10 +160,6 @@ export class HomePage implements AfterViewInit {
       if (selected) {
         // Mettre à jour le titre de la page
         this.pageTitle = selected.trackerData.name;
-  
-        // Mettre à jour le marqueur
-        //this.updateSelectedMarker(selected);
-  
       } else {
         this.pageTitle = 'Accueil';
       }
@@ -177,32 +181,42 @@ export class HomePage implements AfterViewInit {
 
       // Create a marker for the selected coordinates
       const marker = L.marker(coordinates);
-          
-      // Créez un nouveau marqueur avec les nouvelles coordonnées
-      marker.bindPopup(`
-        <div class="custom-popup" style="background: black;">
-          <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
-          <p style="text-align: center;">${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}</p>
-          <table style="width: 100%;">
-            <tr>
-              <th style="color: #EC851E;">Durée Trajet:</th>
-              <th style="color: #EC851E;">Vitesse:</th>
-            </tr>
-            <tr>
-              <td></td>
-              <td>${this.selected.info.position.speed} km/h</td>
-            </tr>
-            <tr>
-              <th style="color: #EC851E;">Distance Trajet:</td>
-              <th style="color: #EC851E;">Altitude:</td>
-            </tr>
-            <tr>
-              <td> km</td>
-              <td>${this.selected.info.position.altitude} m</td>
-            </tr>
-          </table>
-        </div>`
-      );
+
+      // Check if the selected type is "vehicle"
+      if (this.selected.type === 'EmbeddedDevice') {
+        // Bind the popup for vehicle type
+        marker.bindPopup(`
+          <div class="custom-popup" style="background: black;">
+            <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${new Date().toLocaleString()}</h5>
+            <p style="text-align: center;">${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}</p>
+            <table style="width: 100%;">
+              <tr>
+                <td rowspan="4">
+                    <img src="${this.selected.pictureUrl}" alt="Image du véhicule" style="max-height: 100%;">
+                </td>
+                <th style="color: #EC851E;">Vitesse:</th>
+              </tr>
+              <tr>
+                  <td>${this.selected.info.position.speed} km/h</td>
+              </tr>
+              <tr>
+                  <th style="color: #EC851E;">Altitude:</th>
+              </tr>
+              <tr>
+                  <td>${this.selected.info.position.altitude} m</td>
+              </tr>
+            </table>
+          </div>`
+        );
+      } else {
+      // Bind the popup for non-vehicle type
+        marker.bindPopup(`
+          <div class="custom-popup" style="background: black;">
+            <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">${this.selected.address.building ?? new Date().toLocaleString()}</h5>
+            <p style="text-align: center;">${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}</p>
+          </div>`
+        );
+      }
 
       // Check if the vehicle speed is 0.0
       if (speed && speed === '0.0') {
@@ -273,16 +287,19 @@ export class HomePage implements AfterViewInit {
     return await modal.present();
   }
 
+  // This function is used to center the map based on the selected item's position.
+  // If the selected item does not have a position, it will use the address to find the coordinates.
+  // If the map is in cluster mode, it will add a click event to each cluster to display individual markers.
   centerMap(): void {
-    console.log('putain',this.selected.address);
+    // If the selected item does not have a position, use the address to find the coordinates
     if (!this.selected.info.position) {
       this.userService.addressSearch(this.selected.address).pipe(first()).subscribe((response: any) => {
-        console.log(response);
+        // Update the marker with the coordinates from the address search
         this.updateSelectedMarker(response[0].lat, response[0].lon);
       })
       
+      // If the map is not in cluster mode, remove all existing markers
       if (this.map && !this.showClustersAndMarkers) {
-        // Supprimez tous les marqueurs existants de la carte
         this.map.eachLayer((layer) => {
           if (layer instanceof L.Marker) {
             this.map?.removeLayer(layer);
@@ -290,25 +307,41 @@ export class HomePage implements AfterViewInit {
         });
       }
     }
+    // If the selected item has a position, use it to update the marker
     else {
-      console.log('fdp', this.selected)
       this.updateSelectedMarker(this.selected.info.position.latitude, this.selected.info.position.longitude, this.selected.info.position.speed);
     }
-    // Ajoutez cet événement de clic pour les marqueurs individuels dans le cluster
+    
+    // If the map is in cluster mode, add a click event to each cluster
     if (this.showClustersAndMarkers && this.map) {
       this.map.eachLayer((layer) => {
         if (layer instanceof L.MarkerClusterGroup) {
           layer.on('clusterclick', (cluster) => {
+            // If the cluster has more than one marker, remove the cluster and add individual markers
             if (cluster.layer.getAllChildMarkers().length > 1) {
-              // Supprimez le cluster pour pouvoir afficher les marqueurs individuels
               this.map?.removeLayer(cluster.layer);
     
-              // Ajoutez les marqueurs individuels à la carte
+              // Add individual markers to the map and open their popups
               cluster.layer.getAllChildMarkers().forEach((marker: any) => {
                 marker.addTo(this.map);
                 marker.openPopup();
               });
             }
+          });
+        }
+      });
+    }
+    // Si le map est en mode cluster, ajoutez un événement de clic à chaque marqueur dans le cluster
+    if (this.showClustersAndMarkers && this.map) {
+      this.map.eachLayer((layer) => {
+        if (layer instanceof L.MarkerClusterGroup) {
+          layer.on('clusterclick', (cluster) => {
+            cluster.layer.getAllChildMarkers().forEach((marker: any) => {
+              // Ajoutez cet événement de clic au marqueur
+              marker.on('click', () => {
+                marker.openPopup();
+              });
+            });
           });
         }
       });
@@ -508,8 +541,10 @@ selectedDateTrip() {
 
                         tripMarker.bindPopup(`
                         <div class="custom-popup" style="background: black;">
-                                         <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">Adresse</h5>
-                                         <p style="text-align: center;">Nom balise</p>
+                                         <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">
+                                          ${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}
+                                         </h5>
+                                         <p style="text-align: center;">${this.selected.name }</p>
                                          <table style="width: 100%;">
                                            <tr>
                                              <th style="color: #EC851E;">Durée Trajet:</th>

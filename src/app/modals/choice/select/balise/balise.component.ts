@@ -5,6 +5,8 @@ import { CommonModule } from '@angular/common';
 import { UserService } from 'src/app/api/user.service';
 import { HttpHeaders } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { SharedDataService } from 'src/app/api/shared-data.service';
+import { Subscription } from 'rxjs';
 
 
 @Component({
@@ -19,7 +21,8 @@ export class BaliseComponent  implements OnInit {
   trackerDetails: any;
   selectedType: string = 'vehicule';
   filtered : any;
-  constructor(private modalController: ModalController, public userService: UserService) {}
+
+  constructor(private modalController: ModalController, public userService: UserService, private sharedData: SharedDataService) {}
 
   httpOptions = {
     headers: new HttpHeaders({
