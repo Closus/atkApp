@@ -27,3 +27,47 @@
 
 /* Leaflet Map */
 @import "~leaflet/dist/leaflet.css";
+
+::ng-deep .toolbar-background {
+  background: black!important;
+  color: #EC851E;
+}
+
+::ng-deep .week-toolbar.dark {
+  --background: black!important;
+  color: #EC851E;
+}
+
+::ng-deep .dark .week-title {
+  color: #EC851E;
+  background: black;
+}
+
+::ng-deep .dark .days .days-btn p {
+  color: #EC851E!important;
+}
+
+::ng-deep p {
+  color: #EC851E!important;
+}
+
+p {
+  color: #EC851E!important;
+}
+
+::ng-deep toolbar-container {
+  --background: black!important;
+  color: #EC851E!important;
+}
+
+::ng-deep ul {
+  color: #EC851E!important;
+}
+
+ul {
+  color: #EC851E!important;
+}
+
+::ng-deep .dark .week-toolback .toolbar-container .toolbar-content ul {
+  color: #EC851E!important;
+}
