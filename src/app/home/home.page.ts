@@ -399,97 +399,7 @@ export class HomePage implements AfterViewInit {
     });
   }
 
-  // selectedDateTrip() {
-  //   this.clearMap();
-  //   this.isTripSelected = true;
-  //   console.log(this.selected.id);
-  //   console.log(this.numberDate);
-  //   console.log(this.userDetails.user.uuid);
-  //   if (this.numberDate) {
-  //     this.userService.getTripByDate('gettrip', this.selected.id, this.numberDate, this.userDetails.user.uuid).subscribe((data: any) => {
-  //       this.sharedDataService.setTripDataDate(data.tracking);
-  //       console.log(data.tracking, 'on est ici ou kwéééééé');
-  //       const tripCoordinates: L.LatLng[][] = [];
-  //       console.log('data du trip par jour = 1', this.sharedDataService.tripDataDate);
-  
-  //       if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
-  //         this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
-  //           const tripSteps: L.LatLng[] = trip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude)));
-  //           tripCoordinates.push(tripSteps);
-  
-  //           if (this.map) {
-  //             const speed = parseFloat(trip.avgspeed).toFixed(2);
-  //             const distance = parseFloat(trip.distance).toFixed(2);
-  //             const duration = trip.duration;
-  //             const altitude = trip.maxspeed; // ou toute autre information d'altitude si elle est disponible
-  //             // const address = trip.address.features[0].properties; // Modifier selon la structure de l'adresse
-  //             const coordinates = tripSteps[0];
-
-  //             //Création d'un marqueur pour ce voyage spécifique
-  //               const tripMarker = L.circleMarker(tripSteps[0], {
-  //                 radius: 15,
-  //                 color: 'black',
-  //                 fillColor: 'white',
-  //                 fillOpacity: 1,
-  //                 weight: 2
-  //               }).addTo(this.map);
-  
-  //               // Affichage du numéro du voyage
-  //               tripMarker.bindTooltip(`<span style="font-size: 16px; font-weight: bold;">${index + 1}</span>`, {
-  //                 permanent: true,
-  //                 direction: 'center',
-  //                 className: 'step-marker-tooltip',
-  //                 opacity: 1
-  //               });
-  
-  //             // Créez le marqueur avec la popup
-  //             const marker = L.marker(coordinates);
-  //             tripMarker.bindPopup(`
-  //               <div class="custom-popup" style="background: black;">
-  //                 <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">Adresse</h5>
-  //                 <p style="text-align: center;">Nom balise</p>
-  //                 <table style="width: 100%;">
-  //                   <tr>
-  //                     <th style="color: #EC851E;">Durée Trajet:</th>
-  //                     <th style="color: #EC851E;">Vitesse max:</th>
-  //                   </tr>
-  //                   <tr>
-  //                     <td>${duration}</td>
-  //                     <td>${speed} km/h</td>
-  //                   </tr>
-  //                   <tr>
-  //                     <th style="color: #EC851E;">Distance Trajet:</td>
-  //                     <th style="color: #EC851E;">Altitude:</td>
-  //                   </tr>
-  //                   <tr>
-  //                     <td>${distance} km</td>
-  //                     <td>${altitude} m</td>
-  //                   </tr>
-  //                 </table>
-  //               </div>`
-  //             ).addTo(this.map);
-  
-  //             // Création d'un polyline pour le voyage
-  //             const tripPolyline = L.polyline(tripCoordinates[index], { color: 'red' }).addTo(this.map);
-  //           }
-  //         });
-
-  //         console.log('data du trip par jour = ', this.sharedDataService.tripDataDate);
-  
-  //         // Création d'un objet bounds utilisant toutes les coordonnées du voyage
-  //         const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
-  
-  //         // Ajustement de la vue de la carte pour s'adapter aux limites
-  //         if (this.map) {
-  //           this.map.fitBounds(bounds);
-  //         }
-  //       }
-  //     });
-  //   }
-  // }
-
-
-selectedDateTrip() {
+  selectedDateTrip() {
     this.clearMap();
     this.isTripSelected = true;
     this.showClustersAndMarkers = true;
@@ -504,15 +414,7 @@ selectedDateTrip() {
 
             const tripCoordinates: L.LatLng[][] = [];
             const markersCluster = L.markerClusterGroup();  // Création du groupe de clusters
-            // !!! Changer le cluster
-            // const markersCluster = L.markerClusterGroup({
-            //   iconCreateFunction: function(cluster) {
-            //     return L.icon({
-            //       iconUrl: 'blue-cluster-icon.png',
-            //       iconSize: [40, 40]
-            //     });
-            //   }
-            // });
+            console.log('data VENIR VERIFIER ICI', data);
 
             if (this.sharedDataService.tripDataDate && this.sharedDataService.tripDataDate.trips && this.sharedDataService.tripDataDate.trips.length > 0) {
                 this.sharedDataService.tripDataDate.trips.forEach((trip: any, index: any) => {
@@ -534,58 +436,64 @@ selectedDateTrip() {
                             weight: 2
                         });
 
-                        tripMarker.bindTooltip(`<span style="font-size: 16px; font-weight: bold;">${index + 1}</span>`, {
+                        tripMarker.bindTooltip(`<span style="font-size: 16px; font-weight: bold;">${index}</span>`, {
                             permanent: true,
                             direction: 'center',
                             className: 'step-marker-tooltip',
                             opacity: 1
                         });
 
-                        tripMarker.bindPopup(`
-                        <div class="custom-popup" style="background: black;">
-                                         <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">
-                                          ${this.selected.address.road ?? ''} ${this.selected.address.house_number ?? ''}, ${this.selected.address.postcode ?? ''} ${this.selected.address.town ?? ''}
-                                         </h5>
-                                         <p style="text-align: center;">${this.selected.name }</p>
-                                         <table style="width: 100%;">
-                                           <tr>
-                                             <th style="color: #EC851E;">Durée Trajet:</th>
-                                             <th style="color: #EC851E;">Vitesse max:</th>
-                                           </tr>
-                                           <tr>
-                                             <td>${duration}</td>
-                                             <td>${speed} km/h</td>
-                                           </tr>
-                                           <tr>
-                                             <th style="color: #EC851E;">Distance Trajet:</td>
-                                             <th style="color: #EC851E;">Altitude:</td>
-                                           </tr>
-                                           <tr>
-                                             <td>${distance} km</td>
-                                             <td>${altitude} m</td>
-                                           </tr>
-                                         </table>
-                                       </div>`
-                        );
-
-                        markersCluster.addLayer(tripMarker);  // Ajout du marker au groupe de clusters
-
-                        const tripPolyline = L.polyline(tripCoordinates[index], { color: 'red' }).addTo(this.map);
+                        // Get the address of the last step of the trip
+                        const lastStep = trip.steps[0];
+                        this.userService.reverseGeocode(lastStep.latitude, lastStep.longitude).subscribe((address : any) => {
+                            if (address.features && address.features[0] && address.features[0].properties) {
+                                const tripAddress = address.features[0].properties.address;
+                                // Use the address for the popup
+                                tripMarker.bindPopup(`
+                                    <div class="custom-popup" style="background: black;">
+                                        <h5 style="text-align: center;border-bottom: 1px solid #EC851E;padding-bottom: 2px;">
+                                            ${tripAddress.road ?? ''} ${tripAddress.house_number ?? ''}, ${tripAddress.postcode ?? ''} ${tripAddress.town ?? ''}
+                                        </h5>
+                                        <table style="width: 100%;">
+                                            <tr>
+                                                <th style="color: #EC851E;">Durée Trajet:</th>
+                                                <th style="color: #EC851E;">Vitesse max:</th>
+                                            </tr>
+                                            <tr>
+                                                <td>${duration}</td>
+                                                <td>${speed} km
+                                                </tr>
+                                                <tr>
+                                                    <th style="color: #EC851E;">Distance Trajet:</th>
+                                                    <th style="color: #EC851E;">Altitude:</th>
+                                                </tr>
+                                                <tr>
+                                                    <td>${distance} km</td>
+                                                    <td>${altitude} m</td>
+                                                </tr>
+                                            </table>
+                                        </div>`
+                                    );
+                                }
+                            });
+    
+                            markersCluster.addLayer(tripMarker);  // Ajout du marker au groupe de clusters
+    
+                            const tripPolyline = L.polyline(tripCoordinates[index], { color: 'red' }).addTo(this.map);
+                        }
+                    });
+    
+                    if (this.map) {
+                        this.map.addLayer(markersCluster);  // Ajout du groupe de clusters à la carte
+    
+                        const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
+                        this.map.fitBounds(bounds);
                     }
-                });
-
-                if (this.map) {
-
-                  this.map.addLayer(markersCluster);  // Ajout du groupe de clusters à la carte
-
-                  const bounds = L.latLngBounds(tripCoordinates.reduce((acc, val) => acc.concat(val), []));
-                  this.map.fitBounds(bounds);
                 }
-            }
-        });
-      }
+            });
+          }
+        }
     }
-  }
 
   async openTripListModal() {
     this.showButton = true;
@@ -601,24 +509,31 @@ selectedDateTrip() {
         this.onLabelSelected(result.data);
         console.log(result.data);
       }
-      this.showButton = false;
+      this.showButton = true;
     })
     return await modal.present();
   }
 
-  onLabelSelected(label: string) {
-    const selectedTrip = this.sharedDataService.tripDataDate.tracking.trips.find((trip: any) => trip.address.features[0].properties.display_name === label);
-    console.log('selectedTrip = ', selectedTrip, 'ici')
-    if (selectedTrip) {
-      const latitude = parseFloat(selectedTrip.steps[0].latitude);
-      const longitude = parseFloat(selectedTrip.steps[0].longitude);
-      if (!isNaN(latitude) && !isNaN(longitude)) {
-        const coordinates = L.latLng(latitude, longitude);
-        this.map?.setView(coordinates, 15, { animate: true });
-        if(this.map) {
-          const tripPolyline = L.polyline(selectedTrip.steps.map((step: any) => L.latLng(parseFloat(step.latitude), parseFloat(step.longitude))), { color: 'red' }).addTo(this.map);
-        }
-      }
+  onLabelSelected(trip: any) {
+    const trips = this.sharedDataService.tripDataDate.trips;
+    const currentIndex = trips.findIndex((t: any) => t === trip); // trouver l'index du trip actuel
+  
+    // définir le trip suivant
+    let nextTrip;
+    if (currentIndex !== -1 && currentIndex < trips.length - 1) {
+      nextTrip = trips[currentIndex + 1];
+    } else {
+      // Si c'est le dernier trip, vous pouvez soit revenir au premier trip, soit ne rien faire.
+      nextTrip = trips[0];
+    }
+  
+    const firstStep = nextTrip.steps[0];
+    const latitude = parseFloat(firstStep.latitude);
+    const longitude = parseFloat(firstStep.longitude);
+  
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      const coordinates = L.latLng(latitude, longitude);
+      this.map?.setView(coordinates, 15, { animate: true });
     }
   }
   

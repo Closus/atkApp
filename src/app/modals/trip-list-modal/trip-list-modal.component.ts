@@ -62,8 +62,8 @@ export class TripListModalComponent {
     this.modalController.dismiss();
   }
 
-  selectItem(label: string) {
-    this.labelSelected.emit(label); 
+  selectItem(trip: any) {
+    this.labelSelected.emit(trip); 
     this.modalController.dismiss();   
   }
 
